@@ -26,6 +26,17 @@ Planned additions for this entry include:
 - workflow diagrams or step‑by‑step reasoning
 - links to related vault entries
 
+## Planned Vault Entries
+
+This list will grow as the vault evolves.
+
+- [ ] Bayesian Network analysis (Titanic dataset)
+- [ ] Excel → Optuna experiment and journey
+- [ ] CLOPE clustering (R)
+- [ ] Predictive geometallurgy playbook (multi‑part)
+- [ ] Workflows (markdown descriptions + tool suggestions)
+- [ ] How‑tos that output slide decks (R + Quarto)
+
 ## Philosophy
 
 The vault is built on:
