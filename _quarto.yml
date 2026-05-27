@@ -1,0 +1,34 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "mining-ds-vault"
+  site-url: "https://matthew-nimmo.github.io/mining-ds-vault"
+  repo-url: "https://github.com/matthew-nimmo/mining-ds-vault"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: content.qmd
+        text: Content
+    right:
+      - icon: github
+        href: "https://github.com/matthew-nimmo/mining-ds-vault"
+  page-footer:
+    left: "© 2026 Matthew Nimmo"
+    right: "mining-ds-vault"
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-tools: false
+    smooth-scroll: true
+    mainfont: "Source Sans 3"
+    link-external-newwindow: false
+
+editor: source

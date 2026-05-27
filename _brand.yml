@@ -1,0 +1,25 @@
+typography:
+  fonts:
+    - family: League Spartan
+      source: google
+    - family: Spectral
+      source: google
+    - family: Source Sans 3
+      source: google
+    - family: Source Code Pro
+      source: google
+
+  base:
+    family: Source Sans 3
+    size: 12pt
+    line-height: 1.333
+
+  headings:
+    family: Spectral
+    weight: 600
+    color: black
+    line-height: 1.333
+
+  monospace: Source Code Pro
+  monospace-inline: Source Code Pro
+  monospace-block: Source Code Pro

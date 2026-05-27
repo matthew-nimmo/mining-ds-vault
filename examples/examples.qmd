@@ -1,0 +1,78 @@
+```{r}
+#| include: false
+library(fs)
+library(yaml)
+library(stringr)
+library(purrr)
+library(dplyr)
+```
+
+```{r}
+#| echo: false
+#| output: asis
+`%||%` <- function(x, y) if (is.null(x)) y else x
+
+root <- "."
+
+summaries <- dir_ls(root, recurse = TRUE, regexp = "_summary\\.qmd$")
+
+parse_summary <- function(path) {
+  rel <- path_rel(path, root)
+  parts <- str_split(rel, "/")[[1]]
+  depth <- length(parts) - 1
+  
+  # parent folder (H2)
+  parent <- if (depth >= 1) parts[1] else ""
+  
+  # child folder (H3)
+  child <- if (depth >= 2) parts[2] else ""
+  
+  # read YAML + body
+  lines <- readLines(path, warn = FALSE)
+  end <- which(lines[-1] == "---")[1] + 1
+  
+  meta <- yaml::yaml.load(paste(lines[2:(end-1)], collapse = "\n"))
+  body <- if (length(lines) > end) paste(lines[(end+1):length(lines)], collapse = "\n") else ""
+  
+  tibble(
+    path = path,
+    rel = rel,
+    depth = depth,
+    parent = parent,
+    child = child,
+    order = meta$order %||% Inf,
+    title = meta$title %||% str_to_title(gsub("-", " ", child)),
+    subtitle = meta$subtitle %||% "",
+    icon = meta$icon %||% "",
+    body = body
+  )
+}
+
+df <- map_dfr(summaries, parse_summary)
+
+# Hierarchical sort:
+# 1. parent folder
+# 2. H2 order
+# 3. child folder
+# 4. H3 order
+df <- df %>%
+  arrange(parent, depth, order, child)
+
+generate_section <- function(path, rel, depth, parent, child, order, title, subtitle, icon, body) {
+  level <- str_dup("#", depth + 1)
+  icon_html <- if (icon != "") {
+    paste0('<div class="icon icon-', icon, '"></div>\n\n')
+  } else ""
+  paste0(
+    level, " ", title, "\n\n",
+    if (subtitle != "") paste0("**", subtitle, "**\n\n") else "",
+    icon_html,
+    body, "\n"
+  )
+}
+
+output <- df %>% pmap_chr(generate_section) %>% paste(collapse = "\n")
+
+cat(output)
+```
+

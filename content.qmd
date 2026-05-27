@@ -1,0 +1,12 @@
+---
+title: ""
+format:
+  html:
+    toc: true
+---
+
+# Examples
+
+Examples show workflows in practice--small, self-contained, and designed to illuminate analytical reasoning.
+
+{{< include examples/examples.qmd >}}

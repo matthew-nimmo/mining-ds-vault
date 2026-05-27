@@ -1,0 +1,16 @@
+---
+title: ""
+---
+
+<div class="under-construction">
+  <div class="icon icon-engineering"></div>
+  <h1 class="uc-title">Under Construction</h1>
+  <p class="uc-text">
+    This space is being built — thoughtfully, deliberately, and with care.
+    The vault is evolving into a designed system for modern mining data science.
+  </p>
+  <p class="uc-text">
+    Please check back soon as new workflows, patterns, and examples are added.
+  </p>
+  <a href="../index.qmd" class="uc-link">Return to Home →</a>
+</div>

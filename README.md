@@ -17,6 +17,10 @@ The goal of the vault is to provide:
 - literate programming outputs (R + Quarto)
 - practical demonstrations of methods used in mining and related domains
 
+## Notes
+
+The _extension directory contains shared Quarto/Typst extensions, fonts, and assets required to render all vault documents. It is part of the canonical rendering environment and must be included in all source distributions. Document rendering is done from the root directory of the repository.
+
 ## Coming Next
 
 Planned additions for this entry include:
@@ -30,7 +34,7 @@ Planned additions for this entry include:
 
 This list will grow as the vault evolves.
 
-- [ ] Bayesian Network analysis (Titanic dataset)
+- [x] Bayesian Network analysis (Titanic dataset)
 - [ ] Excel → Optuna experiment and journey
 - [ ] CLOPE clustering (R)
 - [ ] Predictive geometallurgy playbook (multi‑part)

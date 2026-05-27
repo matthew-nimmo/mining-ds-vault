@@ -1,0 +1,9 @@
+# Synthetic data
+
+Bayesian Networks can be used to generate synthetic data that replicate the statistical properties of the data used to train the network. The synthetic data could then be used in training regression or classification models with the original data used for model validation.
+
+```{r}
+#| label: c_titanic_synthetic
+#| output: false
+c_titanic_synthetic <- bnlearn::rbn(titanic_bn_final, n = 10000)
+```
