@@ -5,7 +5,7 @@ toc: true
 title: "Scoring Functions"
 subtitle: "Validating Twin Drill Holes for Resource Estimation"
 abstract: |
-  Geological data validation can include the use of twin drill holes to verify the repeatability of mineralization and identify spatial variability. Traditionally, assessing these pairs involves subjective visual inspections of scatter plots and downhole logs, a process that does not scale across large databases. This notebook introduces the foundational concept of Scoring Functions as a mechanism to quantify data integrity. By translating physical geological variance into a normalized, deterministic metric, we demonstrate how raw assay deviations can be mapped to a standardized quality KPI. Using a synthetic copper, iron, and sulphur dataset, we provide a reproducible R framework for modular data assessment, bridging the gap between traditional geological quality control and scalable data engineering.
+ Geological data validation can include the use of twin drill holes to verify historic drill hole data, verify high-grade assay intersections, and check for sampling bias. Traditionally, assessing these paired data involves subjective visual inspections of scatter plots, quantile-quantile plots, and down-hole logs or the use of global statistics. A process that does not scale across large databases. This notebook introduces the foundational concept of Scoring Functions as a mechanism to quantify data integrity. To overcome the problem of scaling the analysis, Scoring Functions are introduced to illustrate how the observed geological variability between the paired data can be translated to a normalized, deterministic metric, which can then be used as a standardized quality KPI. A simple synthetic dataset that contains two drill holes, treated as a twin pair, with lithology and assays for copper, iron, and sulphur is used to demonstrate the use of the Scoring Function. The example and notebook forms a reproducible R framework for modular data assessment, bridging the gap between traditional geological quality control and scalable data engineering.
 author: "Matthew Nimmo"
 date: "2026-June-17"
 date-modified: "2026-June-17"
@@ -62,7 +62,7 @@ Instead of relying on subjective manual reviews, scoring functions allow us to q
 
 ## Case study: validating twin drill holes
 
-Twin drilling is just one of many ways to validate geological data for use in Mineral Resource estimation. They are used to help test the repeatability and very short range variability of the geology and geochemistry. The comparison is usually done manually by plotting the paired data as log traces or scatter plots. Assessment of the results is usually subjective. But it doesn't have to be.
+Twin drilling is just one of many ways to validate geological data for use in Mineral Resource estimation. They are used to help test the repeatability and very short range variability of the geology and geochemistry and to check historic data. The comparison is usually done manually by plotting the paired data as log traces or scatter plots or quantile-quantile plots. Assessment of the results is usually subjective. But it doesn't have to be.
 
 A basic twin drill hole comparison will be used to illustrate how scoring functions could be used to quantify the difference between the original drill hole and its twin.
 
