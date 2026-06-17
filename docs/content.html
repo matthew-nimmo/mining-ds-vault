@@ -131,6 +131,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#examples" id="toc-examples" class="nav-link active" data-scroll-target="#examples">Examples</a>
   <ul class="collapse">
   <li><a href="#exploratory-modelling-with-bayesian-networks" id="toc-exploratory-modelling-with-bayesian-networks" class="nav-link" data-scroll-target="#exploratory-modelling-with-bayesian-networks">Exploratory Modelling with Bayesian Networks</a></li>
+  <li><a href="#scoring-functions" id="toc-scoring-functions" class="nav-link" data-scroll-target="#scoring-functions">Scoring Functions</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -152,6 +153,15 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <p>Bayesian Networks are a statistical modelling technique that represents the joint probability between variables. Mixed networks allow modelling of discrete and continuous variables but require that continuous variables are Gaussian and have linear relationships. Neither of which can be guaranteed when performing exploratory modelling. However, despite this restriction the technique can be used for exploratory modelling to gain insight into the data. Later, in modelling the data, any potential non-Gaussian and non-linearity in the data can be accounted for by adding additional variables to the Bayesian Network (Gaussian Mixture Models are great for this). The Titanic dataset is used to showcase the use of Bayesian Networks to focus Exploratory Data Analysis (EDA) on key data features to speed up the analysis. An added bonus is that a Bayesian Network can be trained on data that contain missing values.</p>
 <p><a href="./examples/Titanic-Data-Analysis/titanic-data-analysis.html" class="card-link">Open Example →</a></p>
+</section>
+<section id="scoring-functions" class="level3">
+<h3 class="anchored" data-anchor-id="scoring-functions">Scoring Functions</h3>
+<p><strong>Validating Twin Drill Holes for Resource Estimation</strong></p>
+<div class="icon icon-data-quality">
+
+</div>
+<p>Geological data validation can include the use of twin drill holes to verify the repeatability of mineralization and identify spatial variability. Traditionally, assessing these pairs involves subjective visual inspections of scatter plots and downhole logs, a process that does not scale across large databases. This notebook introduces the foundational concept of Scoring Functions as a mechanism to quantify data integrity. By translating physical geological variance into a normalized, deterministic metric, we demonstrate how raw assay deviations can be mapped to a standardized quality KPI. Using a synthetic copper, iron, and sulphur dataset, we provide a reproducible R framework for modular data assessment, bridging the gap between traditional geological quality control and scalable data engineering.</p>
+<p><a href="./examples/Scoring-Functions/twin-drillholes.html" class="card-link">Open Example →</a></p>
 
 
 </section>

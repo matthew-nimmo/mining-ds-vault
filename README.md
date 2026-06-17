@@ -35,6 +35,7 @@ Planned additions for this entry include:
 This list will grow as the vault evolves.
 
 - [x] Bayesian Network analysis (Titanic dataset)
+- [x] Scoring Functions (Twin Drill hole assessment)
 - [ ] Excel → Optuna experiment and journey
 - [ ] CLOPE clustering (R)
 - [ ] Predictive geometallurgy playbook (multi‑part)
