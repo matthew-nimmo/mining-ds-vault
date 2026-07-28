@@ -1,0 +1,21 @@
+# The solution
+
+How do we overcome the subtleties of structural bias introduced into the data? How do we prevent data analytics from collapsing under those hidden structural bias? How do we ensure our data analytics project is a success? How do we know if our machine learning model is correctly specified?
+
+Sometimes we don't.
+
+But we can limit the impact of structural data bias that we may inadvertently introduce. There are two things we can do well before any model code is written.
+
+The first is writing a document that defines the operational decisions, boundaries, semantics (glossary of terms), and failure modes for the project. It involves treating data analysis like building a product. This phase is called Business Understanding document in the CRISP-DM process model. Or a Product Requirement Document (PRD) used by cross-functional product teams, product managers, software engineers and developers, and UX/UI designers. The PRD acts as a single source of truth to align everyone on what features to build and why. This document is not part of a proposal. But unfortunately in the mining industry it too often is.
+
+The second is using a Directed Acyclic Graph (DAG) to describe and visualize relationships in the data, or steps in a process. For a data science project the DAG becomes a valuable tool for explaining relationships observed in the data to a geologists or metallurgist before machine learning discovers those relationships.
+
+The DAG acts as the visual, explicit contract where everyone agrees on the semantics--the meaning of the edges and nodes in the DAG and the consequences of that graph. It defines what physical mechanisms exist, which paths are open or closed, and what variables represent true domain causes versus observational traps. It helps us minimise the risk of project failure due to cognitive bias in stakeholders and the semantic trap.
+
+To illustrate this imagine you are a geologist building a mineral resource estimate. It is very common to interpret domains from the data and call those domains geological domains. The domains are defined by applying hard rules to the data. The domain becomes a selection variable $S$ where $rock\ properties \rightarrow domain$. If we expand this it might be $gold\ grade \rightarrow domain \leftarrow copper\ grade$. Note the collision of two arrows into domain. The variable domain is classed as a collider in the DAG.
+
+If we filter the data on domain, we have created a selection bias in the filtered data. If we use domain in machine learning and data analysis, we have created a selection bias in the model. The model is miss-specified and will likely not perform well in operation. The reason is simple $G \rightarrow S$ is not the same as $G \leftarrow S$ where $G$ is the rock properties and $S$ is the domain (selection variable). By constructing a simple DAG we resolve the selection bias and avoid it. The DAG allows us to detect this bias before it becomes a major headache.
+
+When undertaking a project involving cross-disciplinary teams or when a data scientist communicates with a geologist or metallurgist we inevitably run into the semantic trap. The semantic trap is when we think we are talking about the same thing but end up talking about two completely different concepts that use the same words.
+
+In geometallurgy, by seeing the DAG $R \leftarrow G \rightarrow M \rightarrow R$ where: $G$ are geological properties or processes, $M$ are metallurgy properties or processes, and $R$ is the metallurgy response (metal recovery, concentrate grade, mass recovered, particle size distribution, power usage, reagent usage). We can understand that $assays \leftarrow lithology \rightarrow metal\ recovery$ means that if we don't have lithology then assays can be treated as a stand-in (proxy) for lithology and that $assays \rightarrow metal\ recovery$ is a valid statistical relationship (not causal) given a fixed metallurgy context ($M$).

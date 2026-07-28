@@ -1,0 +1,33 @@
+# The challenge
+
+"DAGs aren’t daggy. They are the single most powerful tool we have to stop fooling ourselves with historical data."
+
+Imagine that you are a geometallurgist working at a minesite as part of a multidisciplinary geometallurgy team. The team has recently completed a second round of metallurgy test-work. The first round was sent to laboratory A while the second round was sent to laboratory B. You perform a basic statistical comparison between the test-work results from lab A with lab B. You uncover a discrepancy between the labs results. The results from lab A have higher, significantly higher, concentrate grades. You have uncovered a bias in the data. You might think that lab B somehow stuffed up the results. Yes you uncovered a bias, just not the bias you think.
+
+The team data scientist is now tasked with building a regression model of geology rock properties as predictors of metal recovery from the test-work data. Because of the newly discovered bias, the data scientist is asked to ignore samples from lab B because there is a suspicion that the results are flawed (which could be true). The problem is that you only have 30 samples and by excluding lab B results you end up with only 15 samples. Before filtering the data the data scientist performs exploratory data analysis and determines that the bias is not because of either lab A or lab B producing bad results but instead is because the rock properties of samples sent to lab A were different from lab B. The hidden selection variable has been uncovered and the true cause of the discrepancy revealed.
+
+If you had filtered the data and only use the results from lab A you would have introduced a selection bias which could have had a profound negative impact on the data analysis and machine learning model.
+
+I was that data scientist. I see this happen a lot. It is why I don't filter out data unless I have a very good causal reason for doing so--that the data is truly bad data. It is one of the reasons why I feel so strongly about using DAGs.
+
+This same bias can be introduced in very subtle ways.
+
+I uncovered a similar type of bias when comparing historic sampling data for a mineral project that was collected by a number of different operators. Comparing by Operator revealed the bias but when comparing by Area, the most likely cause of the bias was identified--a different area had a different distribution in one of the economic elements of interest and this area was where that operator was sampling. Is that Operators sampling bad or is the Area truely different from other areas?
+
+It is very easy to create a selection variable, filter the data, and perform an analysis or build a regression or classification model. Then we wonder why the model failed to work in operation. We just fell into a statistical trap.
+
+Imagine you are a metallurgist tasked with interpreting and modelling some test-work results. Your first instinct is to treat all samples the same and reject all samples outside two standard deviation. Or worse, the low metal recovery results are rejected because they are thought to be unreliable or wrong (without proof). You then calculate the mean of the selected samples and treat that average as the average metal recovery for the project. This is then used in financial calculations and minesite engineering design decisions.
+
+Rejecting the outlier samples without any causal reason creates a hidden selection variable which can lead to data bias--the mean of the selected samples is not the same as the mean of the population and is not the same as the means stratified by a confounder (geological properties).
+
+What if those outliers are real and they are encountered during future mining?
+
+I have seen this happen countless times and simply shake my head--Why?
+
+Now picture a scenario where a very comprehensive data analysis was conducted on combined geology and metallurgy data. The analysis revealed that a trace element ($T$) was a strong predictor for metal recovery ($R$). A strong predictor identified by machine learning is not causal--the trace element does not cause metal recovery. Now the confusion. The results are presented to the stakeholder and is rejected. The stakeholder mistakes causality with correlation and thinks that the trace element is the cause, which it is not. The trace element is an indicator for lithology which is the cause as variations in lithology result in variations in mineralogy which directly affects metallurgical processing. The problem is that lithology was not logged and there is no variable in the data for lithology. The machine learning algorithm did what it does, balance the equation by shifting weights to those features that exhibit strong correlation with the target variable. Now the stakeholder has anchored on this and rejects the study.
+
+"We had the data, we ran the model, and the metallurgical recovery prediction made absolute business sense, until..."
+
+"We failed to consider the DAG."
+
+"We fell for the statistical trap."

@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='504.00pt' height='360.00pt' viewBox='0 0 504.00 360.00'>
+<g class='svglite'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+    .svglite g.glyphgroup path {
+      fill: inherit;
+      stroke: none;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHw1MDQuMDB8MC4wMHwzNjAuMDA='>
+    <rect x='0.00' y='0.00' width='504.00' height='360.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw1MDQuMDB8MC4wMHwzNjAuMDA=)'>
+<text x='266.40' y='34.67' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";' textLength='231.91px' lengthAdjust='spacingAndGlyphs'>Mathematical Computational DAG</text>
+</g>
+<defs>
+  <clipPath id='cpNTkuMDR8NDczLjc2fDU5LjA0fDI4Ni41Ng=='>
+    <rect x='59.04' y='59.04' width='414.72' height='227.52' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpNTkuMDR8NDczLjc2fDU5LjA0fDI4Ni41Ng==)'>
+<line x1='174.81' y1='94.08' x2='174.81' y2='250.66' style='stroke-width: 0.75; stroke: #A9A9A9;' />
+<polygon points='172.14,242.02 172.66,242.93 173.18,243.96 173.70,245.19 174.22,246.79 174.73,250.66 174.88,250.66 175.40,246.79 175.92,245.19 176.43,243.96 176.95,242.93 177.47,242.02 ' style='stroke-width: 0.75; stroke: #A9A9A9; fill: #A9A9A9;' />
+<line x1='187.68' y1='264.39' x2='344.26' y2='264.39' style='stroke-width: 0.75; stroke: #A9A9A9;' />
+<polygon points='335.62,267.06 336.53,266.54 337.56,266.02 338.79,265.50 340.39,264.98 344.26,264.47 344.26,264.32 340.39,263.80 338.79,263.29 337.56,262.77 336.53,262.25 335.62,261.73 ' style='stroke-width: 0.75; stroke: #A9A9A9; fill: #A9A9A9;' />
+<line x1='187.68' y1='81.21' x2='344.25' y2='81.21' style='stroke-width: 0.75; stroke: #A9A9A9;' />
+<polygon points='335.61,83.87 336.53,83.35 337.56,82.83 338.79,82.31 340.39,81.80 344.25,81.28 344.25,81.13 340.39,80.62 338.79,80.10 337.56,79.58 336.53,79.06 335.61,78.54 ' style='stroke-width: 0.75; stroke: #A9A9A9; fill: #A9A9A9;' />
+<line x1='357.99' y1='251.52' x2='357.99' y2='94.94' style='stroke-width: 0.75; stroke: #A9A9A9;' />
+<polygon points='360.66,103.58 360.14,102.67 359.62,101.64 359.10,100.41 358.58,98.81 358.07,94.94 357.92,94.94 357.40,98.81 356.88,100.41 356.37,101.64 355.85,102.67 355.33,103.58 ' style='stroke-width: 0.75; stroke: #A9A9A9; fill: #A9A9A9;' />
+<circle cx='174.81' cy='81.21' r='13.74' style='stroke-width: 0.75; fill: #ADD8E6;' />
+<circle cx='174.81' cy='264.39' r='13.74' style='stroke-width: 0.75; fill: #ADD8E6;' />
+<circle cx='357.99' cy='264.39' r='13.74' style='stroke-width: 0.75; fill: #ADD8E6;' />
+<circle cx='357.99' cy='81.21' r='13.74' style='stroke-width: 0.75; fill: #ADD8E6;' />
+</g>
+<g clip-path='url(#cpMC4wMHw1MDQuMDB8MC4wMHwzNjAuMDA=)'>
+<text x='174.81' y='85.18' text-anchor='middle' style='font-size: 12.00px;fill: #00008B; font-family: "Times";' textLength='8.67px' lengthAdjust='spacingAndGlyphs'>X</text>
+<text x='174.81' y='268.37' text-anchor='middle' style='font-size: 12.00px;fill: #00008B; font-family: "Times";' textLength='8.67px' lengthAdjust='spacingAndGlyphs'>Y</text>
+<text x='357.99' y='268.36' text-anchor='middle' style='font-size: 12.00px;fill: #00008B; font-family: "Times";' textLength='7.33px' lengthAdjust='spacingAndGlyphs'>Z</text>
+<text x='357.99' y='85.10' text-anchor='middle' style='font-size: 12.00px;fill: #00008B; font-family: "Times";' textLength='11.33px' lengthAdjust='spacingAndGlyphs'>W</text>
+</g>
+</g>
+</svg>

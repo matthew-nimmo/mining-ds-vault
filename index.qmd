@@ -69,7 +69,7 @@ Workflows define the architecture of mining data science tasks — clear, reprod
 
 Patterns capture reusable modelling structures, data‑quality practices, and analytical motifs that support disciplined thinking.
 
-[View Patterns →](patterns/under-construction.qmd){.card-link}
+[View Patterns →](patterns/patterns.qmd){.card-link}
 :::
 ::::::
 

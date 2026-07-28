@@ -1,0 +1,38 @@
+# The next challenge
+
+It is using them. It is how we use them. It is documenting, describing, and sharing them. It is using them for data engineering, for describing data relationships, for statistical data analysis, for simulating data, for testing hypotheses, for sequencing and scheduling, and for communicating.
+
+For cross-disciplinary teams that rely on data analytics, they become an indispensable vehicle for communicating between team members and to stakeholders. They can limit the blast radius from cognitive bias and the semantic trap. They provide a mechanism of alignment with stakeholders, project and product managers, and team members. Without them we run the gauntlet.
+
+DAGs are also for artificial intelligence (AI). The rapid advancement of large language models (LLMs) and smaller focused language models (SLMs) means that AI will continue to creep into the mining industry, into geology (not only exploration), and into geometallurgy. Agentic AI is quickly becoming a tool to automate almost everything. A DAG allows agentic AI to be guided by reality rather than guess. The DAG provides the structural rails on which the agentic AI can run. It prevents infinite loops, enables parallel task execution, and maps dependencies. It defines what is allowed and improves adaptability.
+
+The challenge becomes sharing DAGs across the mining industry. The missing link (@lst-missing-link) in applying data science to geometallurgy and geology problems is the lack of open source DAGs that describe known causal relationships.
+
+::: {#lst-missing-link}
+
+```
+[ Geological Models ]      [ Process Metallurgy ]
+  "Lots of Theory"            "Lots of Theory"
+         \                          /
+          \                        /
+           [   Missing Link:     ]
+           [ Causal Graph (DAG)  ]
+```
+
+The missing link.
+
+:::
+
+
+Consider this. Processing a rock to concentrate and extract an element, the same rock properties ($G$), under the same operational metallurgical process flow sheet and conditions ($M$), will always produce the same metallurgical response ($R$), regardless of where on Earth that rock was mined. It is fundamentally:
+
+$$Same\ Rock\ Properties\ (G) + Same\ Operational\ Conditions\ (M) = Same\ Metallurgical\ Response\ (R)$$
+Or as a DAG $G \rightarrow M \rightarrow R$.
+
+To apply this globally, we introduce $P$ representing project-specific adaptations that modulate how $G$ and $M$ interact at a specific site. By separating physical causal properties $G$ (Geology) and $M$ (Metallurgy) from site-specific constraints ($P$), we can build modular, adaptable DAGs that scale across operations.
+
+The next challenge is also treating DAGs as products. Not diagrams, not academic artefacts, not one‑off project sketches. Products.
+
+DAGs can become product infrastructure. They can be versioned, governed, shared, and reused. When we treat them as first‑class artefacts, with clear semantics, ownership, change‑control, and cross‑functional alignment,  they become the structural rails that keep analytics, modelling, and AI grounded in reality. They prevent silent failure modes, reduce cognitive bias, and provide a stable causal backbone that scales across teams, projects, and intelligent systems.
+
+In mining, geology, and geometallurgy, we’ve never really treated these causal structures as products. But that’s exactly what they need to be. Because once a DAG becomes part of the product stack, documented, maintained, and iterated, they transform from a helpful diagram into a shared operational truth. And that truth is what allows data science, engineering, and agentic AI to work together without collapsing under hidden bias or semantic traps.

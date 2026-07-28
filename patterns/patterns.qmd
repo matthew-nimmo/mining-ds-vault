@@ -13,7 +13,7 @@ library(dplyr)
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
 project_root <- quarto::find_project_root()
-root <- fs::path(project_root, "examples")
+root <- fs::path(project_root, "patterns")
 summaries <- dir_ls(root, recurse = TRUE, regexp = "_summary\\.qmd$")
 
 parse_summary <- function(path) {

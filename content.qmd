@@ -10,3 +10,9 @@ format:
 Examples show workflows in practice--small, self-contained, and designed to illuminate analytical reasoning.
 
 {{< include examples/examples.qmd >}}
+
+# Patterns
+
+Patterns capture reusable modelling structures, data‑quality practices, and analytical motifs that support disciplined thinking.
+
+{{< include patterns/patterns.qmd >}}

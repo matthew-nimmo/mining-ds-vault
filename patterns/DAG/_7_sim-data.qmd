@@ -1,0 +1,665 @@
+# Simulating data from a DAG
+
+Simulating synthetic data directly from a Directed Acyclic Graph (DAG) allows us to create controlled testing environments. By explicitly defining structural equations, we can model how variables interact.
+
+The simulated data can be compared with real data to confirm if the expected model matches reality. If it does not match then this tells us that we have miss-specified the relationships in the DAG, miss-specified the parameters of the nodes, or have missing or hidden variables. When structural dependencies are deliberately removed or omitted during data acquisition, unmeasured confounding bias is introduced. This bias distorts the observed statistical distributions of the remaining measured parameters.
+
+The `simDAG` package [@R-simDAG] provides an intuitive, node-by-node framework for building static or longitudinal structural equation models. It can be used to simulate data from a DAG. The DAG can contain a mix of categorical (factors) and continuous variables.
+
+The `bnlearn` package [@R-bnlearn] is an extensive framework for Bayesian Networks. It includes an extensive list of structural learning algorithms which can be used to learn the DAG from data. The package also includes functions to learn the Bayesian Network parameters with and without missing values.
+
+Additional R packages used in simulating data include `dplyr` [@R-dplyr] for data manipulation and `ggplot2` and `ggdag` for visualisation.
+
+```{r}
+#| output: false
+library(simDAG)
+library(bnlearn)
+library(SEMgraph)
+library(ggplot2)
+library(ggdag)
+library(patchwork)
+library(dplyr)
+library(tidyr)
+library(broom)
+source("./r/rtruncnorm.R")
+source("./r/plot_dag.R")
+```
+
+The helper function `rtruncnorm` is used to generate a random Gaussian distribution that can be truncated at lower and upper limits. A naive truncation by only selecting values above or below a threshold alters the Gaussian distribution.
+
+```r
+{{< include ./r/rtruncnorm.R >}}
+```
+
+## Structural data illusions
+
+To understand the data we are analysing, first be aware that data illusions (bias) are lurking, just waiting to cause as much confusion and damage as possible. The main illusions to be aware of and conscious of when doing data analysis are Simpson's Paradox, Berkson's Paradox, and Survivorship Bias.
+
+In resource modelling and geometallurgy, we rely heavily on observational data, but data rarely speaks for itself without structural context. Simpson’s Paradox and Berkson’s Paradox represent two classic, highly disruptive statistical illusions that occur when data is analysed without accounting for the underlying network of data relationships (DAG). While they look like mathematical anomalies, they are actually systemic errors rooted in the structure of Directed Acyclic Graphs (DAGs).
+
+Simpson’s Paradox occurs when we fail to control for a confounder (a common cause), blending distinct populations and reversing true trends.
+
+Berkson’s Paradox occurs when we accidentally control for a collider (a common effect), filtering our data down to a biased subset and manufacturing fake relationships out of thin air.
+
+For a mining professional, failing to recognize these structural traps can lead to catastrophic errors—such as misinterpreting the physical properties of an orebody or optimizing a processing plant around a geological correlation that does not actually exist.
+
+We should always be aware that correlation does not equal causation and be vigilant to confounders and latent variables (missing or hidden variables).
+
+In geology, we are commonly filtering data by a selection variable and then doing some data analysis, modelling, or prediction. This is the danger zone. By filtering the data or sampling by a factor we risk selection bias. An example might be when comparing laboratory A with laboratory B as part of a quality assurance and quality control (QAQC) program. The danger lies in if, inadvertently, samples sent to lab A have specific rock properties, while samples sent to lab B have different properties. This same scenario could occur when comparing historic data with more recent data where the two data sets have been collected over different areas or under different sampling protocols. Or when performing metallurgy test-work. In these scenario we have a hidden selection variable.
+
+Another example in geology is when we do geological interpretation of the data and construct domains. Those domains typically depend on lithology and grade bins. The domain is now a selection variable and is a collider where $Lithology \rightarrow Domain \leftarrow Geochemistry$ or $Bulk Density \rightarrow Domain \leftarrow Geochemistry$. Note that these selection variables are not the same as a latent discrete variable that determines rock properties such as $Bulk Density \leftarrow U \rightarrow Geochemistry$ where $U$ affects both the rocks bulk density and geochemistry and could be used in sample selection $U \rightarrow S$. In this instance $U$ could represent oretype and then we use oretype for metallurgy sampling--for this scenario it is important to sample all classes of $U$ uniformly so we don't bias the results and generate an unbalanced dataset.
+
+### Simpson's Paradox
+
+Simpson's Paradox is a striking phenomenon in probability and statistics where a trend or correlation appears in several different groups of data, but completely reverses or disappears when these groups are combined.
+
+It occurs when a critical hidden factor, called a confounding variable, is ignored. This confounder influences both the assumed cause and the effect, distorting the overall relationship and leading to potentially disastrous analytical conclusions if not addressed.
+
+A classic example of the Simpson's paradox is illustrated in @fig-sp1. The plot shows the data generating DAG on the left hand side and a scatter plot of $Y$ on $X$ where data points are coloured by group with a set of corresponding coloured regression lines and a single black regression line representing all data combined. From the plot it is very obvious that a bias exists.
+
+```{r}
+#| label: fig-sp1
+#| fig-cap: "Simpson's Paradox - classic example"
+#| fig.width: 8
+#| fig.height: 4
+
+set.seed(123)
+
+# Generate data
+n <- 300
+z <- sample(1:3, n, replace=TRUE)
+x <- 2 * z + rnorm(n, mean=0, sd=0.5)
+y <- 5 * z - 1.5 * x + rnorm(n, mean=0, sd=0.5)
+simpson_data <- data.frame(X=x, Y=y, Z=as.factor(z))
+
+# --- Plots ---
+# Left: The DAG
+dag_simpson <- dagify(X ~ Z, Y ~ Z, Y ~ X, exposure="X", outcome="Y") |>
+  tidy_dagitty() |>
+  ggdag(node_size=12) + 
+  theme_dag() + 
+  labs(title = "Simpson's Paradox DAG")
+
+# Right: The Scatter Plot
+plot_simpson <- ggplot(simpson_data, aes(x=X, y=Y)) +
+  geom_point(aes(color=Z), alpha=0.7) +
+  geom_smooth(method="lm", se=FALSE, color="black", linetype="dashed", size=1.2) +
+  geom_smooth(aes(color=Z), method="lm", se=FALSE, size=1) +
+  theme_minimal() +
+  labs(title="Scatter Plot: Y ~ X",
+       subtitle="Dashed line = Aggregate (Omitted Z)\nColored lines = Stratified by Z")
+
+# Display side-by-side
+dag_simpson + plot_simpson
+```
+
+Real data tends not to be so obvious. The Simpson's Paradox can hide when the groups overlap. The scatter plot of all data could show a strong correlation between $X$ and $Y$ or it might not show any correlation at all. Using the same approach as for @fig-sp1, but intentionally confusing the identification of the grouping, the plot in @fig-sp2 shows the same effect but is much harder to detect. If we didn't measure the confounder $Z$ we may never suspect a bias exists and naively think that the negative correlation (black dashed line) is real.
+
+```{r}
+#| label: fig-sp2
+#| fig-cap: "Simpson's Paradox - more difficult example"
+#| fig.width: 8
+#| fig.height: 4
+
+set.seed(123)
+
+n_group <- 150
+
+# Group 1: High Z, lower X, steep negative slope
+z1 <- data.frame(
+  X = rnorm(n_group, mean=2, sd=0.8),
+  Z = "Group 1"
+) |> mutate(Y = 3 + 4.5 * X + rnorm(n_group, sd=4.8))
+
+# Group 2: Medium Z, medium X, flat/slight positive slope
+z2 <- data.frame(
+  X = rnorm(n_group, mean=4, sd=0.8),
+  Z = "Group 2"
+) |> mutate(Y = 5 + 0.2 * X + rnorm(n_group, sd=4.8))
+
+# Group 3: Low Z, higher X, moderate positive slope
+z3 <- data.frame(
+  X=rnorm(n_group, mean=6, sd=0.8),
+  Z="Group 3"
+) |> mutate(Y = 0.2 + 0.8 * X + rnorm(n_group, sd=0.8))
+
+# Combine into a single dataset
+simpson_subtle <- rbind(z1, z2, z3)
+
+# --- Plots ---
+# Left: The DAG
+dag_simpson <- dagify(X ~ Z, Y ~ Z, Y ~ X, exposure="X", outcome="Y") |>
+  tidy_dagitty() |>
+  ggdag(node_size=12) + 
+  theme_dag() + 
+  labs(title="Simpson's Paradox DAG")
+
+# Right: The Scatter plot
+plot_simpson <- ggplot(simpson_subtle, aes(x=X, y=Y)) +
+  geom_point(aes(color=Z), alpha=0.4) +
+  scale_color_brewer(palette="Set1") +
+  geom_smooth(method="lm", se=FALSE, color="black", linetype="dashed", size=1.2) +
+  geom_smooth(aes(color=Z), method="lm", se=FALSE, size=1) +
+  theme_minimal() +
+  labs(
+    title="Subtle Simpson's Paradox (Overlapping Groups)",
+    subtitle="Dashed line = Combined Positive Trend\nColored lines = True Group Slopes",
+    color="Confounder (Z)"
+  )
+
+# Display side-by-side
+dag_simpson + plot_simpson
+```
+
+### Berkson's Paradox (Collider Bias)
+
+Berkson’s Paradox (also known as selection bias or admission-rate bias) is a counterintuitive phenomenon in statistics where two variables appear to have a strong negative correlation in a subset of data, even though they are completely unrelated or even positively correlated in the overall population.
+
+While Simpson’s Paradox is caused by a hidden confounder that you forgot to control for, Berkson’s Paradox is caused by mistakenly controlling for a collider. It happens when you selectively analyse data from a sub-population that has already been filtered based on a specific criteria or outcome, inadvertently creating a statistical illusion.
+
+The Berkson's paradox is illustrated in @fig-bp1. Note the differences in the DAG compared with the Simpson's Paradox DAG in @fig-sp1 and @fig-sp2. This time $Z$ in the DAG is a collider and $X$ has no direct effect on $Y$. The scatter plot of $Y$ on $X$ shows all data in grey and the selected data in red. Again it is obvious that we have introduced a selection bias. This is shows the importance of doing exploratory data analysis and plotting the data to reveal data problems. The problem though is what if the selection occurred before we got the data and we where not aware of the selection. What if that non-selected data is not available and cannot be sampled.
+
+```{r}
+#| label: fig-bp1
+#| fig-cap: "Berkson's Paradox"
+#| fig.width: 8
+#| fig.height: 4
+
+# Generate data
+n_berk <- 500
+x_b <- rnorm(n_berk, mean=0, sd=1)
+y_b <- rnorm(n_berk, mean=0, sd=1)
+
+# Z is the collider (if X + Y > 0.5)
+z_score <- x_b + y_b + rnorm(n_berk, sd=0.1)
+selected <- ifelse(z_score > 0.5, "Selected", "Not Selected")
+
+berkson_data <- data.frame(X=x_b, Y=y_b, Status=as.factor(selected))
+
+# --- Plots ---
+# Left: The DAG
+dag_berkson <- dagify(Z ~ X, Z ~ Y, exposure="X", outcome="Y") |> 
+  tidy_dagitty() |>
+  ggdag(node_size=12) + 
+  theme_dag() + 
+  labs(title="Berkson's Paradox DAG")
+
+# Right: The Scatter Plot
+plot_berkson <- ggplot(berkson_data, aes(x=X, y=Y)) +
+  geom_point(aes(color=Status), alpha=0.6) +
+  scale_color_manual(values = c("Not Selected" = "grey70", "Selected" = "red")) +
+  geom_smooth(method="lm", se=FALSE, color="black", linetype="dashed", size=1.2) +
+  geom_smooth(data=filter(berkson_data, Status == "Selected"), 
+              method="lm", se=FALSE, color="red", size=1.2) +
+  theme_minimal() +
+  labs(title="Scatter Plot: Y ~ X",
+       subtitle="Dashed line = All Data\nRed line = Selected Data Only (Z = 1)")
+
+# Display side-by-side
+dag_berkson + plot_berkson
+```
+
+### Survivorship Bias
+
+Survivorship bias is a form of selection bias where a dataset has already been filtered by a selection process (survival or success). It occurs when the failures (non-survivors) are excluded from the data and ignored. It creates a dangerously skewed perception of reality and leads to overestimate the odds of success.
+
+The bias is similar to the Berkson's Paradox. They are both a collider bias or selection bias. The bias differs in the selection mechanics and missing data. The selection mechanism in Berkson's Paradox is static into a specific environment or database while Survivorship Bias is dynamic filtering over time where failures/losses physically exit the pool of observation. The missing data in Survivorship Bias is irretrievable while the missing data in Berkson's Paradox are available and could be selected.
+
+Survivorship Bias is illustrated in @fig-sb1. The scatter plot of $Y$ on $X$ shows all data in grey and the selected data in red. Again it is obvious that we have introduced a selection bias if we had the data for failures (which we don't).
+
+```{r}
+#| label: fig-sb1
+#| fig-cap: "Survivorship Bias"
+#| fig.width: 8
+#| fig.height: 4
+
+set.seed(123)
+
+n_planes <- 1000
+
+# Generate Independent Hits (Fuselage and Engine are completely uncorrelated)
+fuselage_hits <- rtruncnorm(n_planes, mean=5, sd=1.5, a=0)
+engine_hits <- rtruncnorm(n_planes, mean=5, sd=1.5, a=0)
+
+# Define Survival (S)
+# The engine is critical; if engine hits are high, the plane crashes.
+# The fuselage is sturdy; fuselage hits barely affect survival.
+survival_threshold <- 7.5
+survived <- ifelse(engine_hits + (0.5 * fuselage_hits) < survival_threshold, "Returned to Base", "Shot Down")
+
+plane_data <- data.frame(
+  Fuselage_Hits=fuselage_hits,
+  Engine_Hits=engine_hits,
+  Status=as.factor(survived)
+)
+
+# --- Plots ---
+# Left: The DAG (S acts as a collider)
+coords <- list(
+  x = c(X=1, Y=3, S=2),
+  y = c(X=2, Y=2, S=1)
+)
+
+dag_surv <- dagify(
+  S ~ X, 
+  S ~ Y, 
+  exposure="X", 
+  outcome="Y",
+  coords=coords
+) |> 
+  tidy_dagitty() |> 
+  ggdag(node_size=12) + 
+  theme_dag() + 
+  scale_x_continuous(expand = expansion(mult = 0.2)) +
+  labs(
+    title="Survivorship Bias DAG", 
+    subtitle="X = Fuselage Hits\nY = Engine Hits\nS = Survival (Collider)"
+  )
+
+# Right: The Scatter Plot
+plot_surv <- ggplot(plane_data, aes(x=Fuselage_Hits, y=Engine_Hits)) +
+  geom_point(aes(color=Status), alpha=0.5) +
+  scale_color_manual(values=c("Shot Down" = "grey75", "Returned to Base"="firebrick")) +
+  geom_smooth(method="lm", se=FALSE, color="black", linetype="dashed", size=1.2) +
+  geom_smooth(data=filter(plane_data, Status == "Returned to Base"), 
+              method="lm", se=FALSE, color="firebrick", size=1.2) +
+  theme_minimal() +
+  labs(
+    title="WWII Armor: Damage Distribution",
+    subtitle="Dashed line = All Planes (Unbiased)\nRed line = Survivors (Biased Sample)",
+    x="Fuselage Hits (Sturdy)",
+    y="Engine Hits (Critical)",
+    color="Plane Status"
+  )
+
+# Display side-by-side
+dag_surv + plot_surv + plot_layout(widths=c(7, 8))
+```
+
+### Automatically detecting the illusions
+
+It is possible to perform an automatic test on the data to determine if the Simpson's paradox and Berksons's paradox might exist.
+
+#### Simpson's paradox detection
+
+The function `detect_simpsons_paradox` fits a global linear model ($y∼x$) and records the slope sign (+ or −). It then splits the data by your designated confounder and recalculates the slopes. If any subgroup slope sign opposes the global slope sign, it flags the Simpson's paradox.
+
+```{r}
+# Detect Simpson's Paradox
+# Compares global regression slope vs. stratified subgroup regression slopes
+detect_simpsons_paradox <- function(data, x_var, y_var, group_var) {
+  message("\n--- Checking for Simpson's Paradox ---")
+  
+  # Global Model
+  global_formula <- as.formula(paste(y_var, "~", x_var))
+  global_slope <- lm(global_formula, data=data) |> 
+    tidy() |> 
+    filter(term == x_var) |> 
+    pull(estimate)
+  
+  # Grouped Model
+  group_slopes <- data |>
+    nest_by(!!sym(group_var)) |>
+    mutate(model = list(lm(global_formula, data = data))) |>
+    summarise(
+      Group = !!sym(group_var),
+      Slope = tidy(model) |> filter(term == x_var) |> pull(estimate)
+    )
+  
+  # Print results
+  print(paste("Global Linear Slope:", round(global_slope, 4)))
+  print("Slopes by Subgroup:")
+  print(group_slopes)
+  
+  # Paradox Check: Do the subgroup slopes have a different sign than the global slope?
+  paradox_detected <- any(sign(group_slopes$Slope) != sign(global_slope))
+  
+  if (paradox_detected) {
+    message("⚠️ SIMPSON'S PARADOX DETECTED! The global trend contradicts the subgroup trends.")
+  } else {
+    message("✅ No Simpson's Paradox detected. Trends are consistent.")
+  }
+}
+```
+
+#### Berkson's paradox detection
+
+The `detect_berksons_paradox` calculates the true baseline Pearson correlation coefficient between two variables across the entire deposit database. It then filters the dataset using your selection constraint and re-runs the correlation. If the baseline is neutral/positive but the filtered selection registers a strong negative value, it flags the selection bias.
+
+```{r}
+# Detect Berkson's Paradox
+# Compares correlation of the whole population vs. a conditioned subset (collider)
+detect_berksons_paradox <- function(data, var1, var2, filter_var, target_condition) {
+  message("\n--- Checking for Berkson's Paradox ---")
+  
+  # Global Correlation
+  global_corr <- cor(data[[var1]], data[[var2]], method="pearson")
+  
+  # Filtered Data (Conditioning on the Collider)
+  filtered_data <- data |> filter(!!sym(filter_var) == target_condition)
+  filtered_corr <- cor(filtered_data[[var1]], filtered_data[[var2]], method="pearson")
+  
+  # Print results
+  print(paste("Global Correlation (Unfiltered Dataset):", round(global_corr, 4)))
+  print(paste("Conditioned Correlation (Filtered Dataset):", round(filtered_corr, 4)))
+  
+  # Paradox Check: If global is near-zero/positive, but conditioned is strongly negative
+  if (global_corr >= -0.1 && filtered_corr < -0.3) {
+    message("⚠️ BERKSON'S PARADOX DETECTED! Filtering data has manufactured an artificial negative correlation.")
+  } else {
+    message("✅ No Berkson's Paradox detected.")
+  }
+}
+```
+
+#### Example
+
+```{r}
+set.seed(42)
+n_samples <- 1000
+
+# Lithology A: Weathered/Porous Ore (High Iron, Low Bulk Density due to vugs/voids)
+lith_A <- tibble(
+  Lithology    = "Weathered_Ore",
+  Iron_Pct     = rnorm(n_samples / 2, mean = 55, sd = 5),
+  # Within this lithology, higher Fe means slightly higher density
+  Bulk_Density = 2.0 + (0.02 * Iron_Pct) + rnorm(n_samples / 2, sd = 0.1),
+  Gold_g_t     = rnorm(n_samples / 2, mean = 0.8, sd = 0.3),
+  Copper_Pct   = rnorm(n_samples / 2, mean = 0.4, sd = 0.15)
+)
+
+# Lithology B: Fresh BIF (Lower Iron overall, but dense, tight mineral matrix)
+lith_B <- tibble(
+  Lithology    = "Fresh_BIF",
+  Iron_Pct     = rnorm(n_samples / 2, mean = 35, sd = 5),
+  # Within this lithology, higher Fe also means higher density
+  Bulk_Density = 3.2 + (0.02 * Iron_Pct) + rnorm(n_samples / 2, sd = 0.1),
+  Gold_g_t     = rnorm(n_samples / 2, mean = 0.7, sd = 0.3),
+  Copper_Pct   = rnorm(n_samples / 2, mean = 0.35, sd = 0.15)
+)
+
+# Combine
+deposit_df <- bind_rows(lith_A, lith_B) |>
+  mutate(
+    # Engineering Collider: Stockpile Selection Rule
+    # Core is sent to High-Grade stockpile if Cu > 0.6% OR Au > 1.2 g/t
+    In_High_Grade_Stockpile = ifelse(Copper_Pct > 0.6 | Gold_g_t > 1.2, "Yes", "No")
+  )
+
+# Test 1: Density vs Iron, grouped by Lithology (Confounder)
+detect_simpsons_paradox(
+  data = deposit_df, 
+  x_var = "Iron_Pct", 
+  y_var = "Bulk_Density", 
+  group_var = "Lithology"
+)
+
+# Test 2: Copper vs Gold, filtered by Stockpile Selection (Collider)
+detect_berksons_paradox(
+  data = deposit_df, 
+  var1 = "Copper_Pct", 
+  var2 = "Gold_g_t", 
+  filter_var = "In_High_Grade_Stockpile", 
+  target_condition = "Yes"
+)
+```
+
+```{r}
+#| fig-cap: "Example Simpsons Paradox"
+#| label: fig-dag6
+#| fig-width: 7
+#| fig-height: 4
+
+# Quick Visual Verification
+# Simpson's Visual Validation
+ggplot(deposit_df, aes(x = Iron_Pct, y = Bulk_Density)) +
+  geom_point(aes(color = Lithology), alpha = 0.4) +
+  geom_smooth(method = "lm", color = "black", se = FALSE, linetype = "dashed") + # Global
+  geom_smooth(aes(color = Lithology), method = "lm", se = FALSE) + # Grouped
+  labs(title = "Simpson's Paradox Visualized", subtitle = "Dotted black line = Global, Colored lines = Per-Lithology") +
+  theme_minimal()
+```
+
+## Simulating a more complex DAG
+
+A benefit of building a DAG manually and then simulating data is to test various hypotheses and to compare the generated synthetic data against real observations. To illustrate this a truth data set is first generated using the R package `simDAG`. This dataset is filtered by row and column to produce a measured dataset. The measured dataset is then used to build a DAG by training a Bayesian Network. This network is then used to generate a synthetic data to replicate the measured data.
+
+The replicated data reflects what we might think the relationships are from the data we have.
+
+By generating a truth dataset, a measured (actual) dataset, and a replicated (synthetic) dataset we can assess the impact of including or excluding variables. As the selection bias examples illustrate, excluding important variables from the measured dataset can lead to results that differ wildly from the truth. The true data generating process is hiding latent variables waiting to wreak havoc on our analysis. This can lead us to make false assumptions and make costly mistakes based on those assumptions.
+
+The DAG illustrated in @fig-dag is used for this example. It is treated as a probabilistic graphical model where the nodes represent variables. Different `simDAG` node types--'rcategorical', 'rnorm', 'rbernoulli', 'gaussian', and 'identity'--are used for illustrative purposes.
+
+### Truth dataset
+
+The truth DAG (@fig-dag) is used to define the structure while the parameters of the probabilistic graphical model are set arbitrarily.
+
+```{r}
+dag_truth <- empty_dag() +
+  node("C", type="rcategorical", probs=c(0.15, 0.47, 0.38),
+       output="factor", labels=c("a", "b", "c")) +
+  node("I", type="rnorm", mean=15.0, sd=1.5) +
+  node("J", type="rbernoulli", p=0.5, output="logical") +
+  node("L", type="rnorm", mean=-1.3, sd=5.5) +
+  node("E", type="gaussian",
+       formula= ~ 2.0 + I*1.5 + Cb*-1.1 + Cc*7,
+       error=0.7,
+       parents=c("I","C")) +
+  node("G", type="gaussian", error=4.5,
+       formula=~ 3.5 + Cb*5.2 + Cc*-11.1,
+       parents="C") +
+  node("S", type="identity",
+       formula=~ (E + L) < 20.7,
+       parents=c("E","L")) +
+  node("M", type="gaussian",
+       formula=~ 1.7 + E*3.44,
+       error=3.7,
+       parents="E") +
+  node("D", type="gaussian",
+       formula= ~ 0.1 + E*15.2 + M*-2.7 + L*4.3 + G*8.6 + JTRUE*-5.68,
+       error=3.1,
+       parents=c("E","M","L","G","J")) +
+  node("Z", type="identity",
+       formula=~ ifelse(D > 1.2, TRUE, FALSE),
+       parents="D")
+
+# Simulate the True Dataset
+set.seed(2131)
+n_samples <- 10000
+df_truth <- sim_from_dag(dag_truth, n_sim=n_samples) |> 
+  as.data.frame() |>
+  mutate(Source = "Truth")
+```
+
+The results of simulating data from @fig-dag is shown in @fig-dag1. The plot shows the data generating DAG on the left hand side and a scatter plot of $D$ on $E$ where data points are coloured by the confounder variable $C$.
+
+```{r}
+#| label: fig-dag1
+#| fig-cap: "Example simulating from a DAG using simDAG"
+#| fig.width: 8
+#| fig.height: 4
+
+x <- df_truth[order(df_truth$S), ]
+
+# --- Plots ---
+# Left: The DAG
+dag_a <- dagify(
+  E ~ I + C,
+  G ~ C,
+  S ~ E + L,
+  M ~ E,
+  D ~ E + M + L + G + J,
+  Z ~ D
+) |> 
+  tidy_dagitty(layout="stress") |>
+  ggplot(aes(x=x, y=y, xend=xend, yend=yend)) +
+    geom_dag_edges_link(aes(start_cap=ggraph::circle(5,"mm"),
+                            end_cap=ggraph::circle(5,"mm"))) +
+    geom_dag_point(size=9) +
+    geom_dag_text(size=4) +
+    theme_dag() +
+    labs(title="DAG")
+
+# Right: Scatter plot
+plot_a <- ggplot(x, aes(x=E, y=D)) +
+  geom_point(aes(color=C), alpha=0.5, size=0.5) +
+  geom_smooth(method="lm", se=FALSE, color="black", linetype="dashed", size=1.2) +
+  geom_smooth(aes(color=C), method="lm", se=FALSE, size=1) +
+  theme_minimal() +
+  labs(title="Scatter Plot: D ~ E",
+       subtitle="Dashed line = Aggregate\nColored lines = Stratified by C")
+
+# Display side-by-side
+dag_a + plot_a + plot_layout(widths=c(8, 6))
+```
+
+### The measured dataset
+
+The truth dataset (`df_truth`) is subset by filtering rows where the variable $S$ is true. Only the variables $E$, $D$, and $Z$ are selected. The $Z$ variable is converted from logical to a factor.
+
+```{r}
+df_measured <- df_truth[df_truth$S, c("E","D","Z")] |>
+  mutate(Z = as.factor(Z),
+         Source = "Truth")
+```
+
+### The replicated dataset
+
+We can manually construct a DAG and specify its parameters to generate a synthetic dataset with the aim of replicating the measured data. The model parameters can be specified by trial and error or by using the base R `lm` function.
+
+For more complex datasets the manual approach to constructing the DAG can be tedious, time consuming, and prone to errors. An alternative is to use the structure learning algorithms to automatically build the DAG.
+
+The R package `bnlearn` contains a good selection of structure learning algorithms. The package also has functions to learn the parameters of the DAG using either a discrete network or a mixed network (discrete and continuous variables) and with or without missing values in the training data. The nodes for discrete variables contain conditional probability tables while the continuous nodes are a mixture of Gaussians. A mixed-Gaussian network can model both linear and non-linear relationships. The learned DAG model is referred to as a Bayesian Network.
+
+Like any machine learning algorithm the Bayesian Network is prone to over-fitting and can only learn a statistical DAG where relationships model the joint conditional probability between nodes. It does not learn a causal graph. For that you need domain expertise which may lead to reversing edge directions or including latent variables and deleting edges.
+
+Note that when learning a DAG, the `bnlearn` function can utilize white lists and black lists. White lists are edges that must appear in the network--these may be links that we know are to be true causal links. Black lists are edges that cannot occur in the network--these are links that physically cannot exist such as going backwards in time.
+
+We can use the Bayesian Network to generate a synthetic dataset just like we could with `simDAG`. For the `bnlearn` package we use the function `rbn()`.
+
+```{r}
+# Learn the DAG and fit the Bayesian Network
+dag <- hc(df_measured[,-4])
+bn_model <- bn.fit(dag, df_measured[,-4])
+
+# Generate synthetic data
+set.seed(101)
+n_samples <- 2400
+df_replicated <- rbn(bn_model, n=n_samples) |> 
+  mutate(Source = "Synthetic")
+```
+
+Comparing the replicated dataset generated from the Bayesian Network against the true measured dataset shows very good agreement between the two datasets (@fig-res1). Bayesian Networks can replicate data but the learned DAG is not a causal DAG and may contain edges that are physically impossible. But as a generative model Bayesian Networks can be very useful for exploring and understanding the data and for replicating the data. We could use the trained network to generate synthetic data that can be used to augment or replace the training data.
+
+```{r}
+#| label: fig-res1
+#| fig-cap: "Comparison between measured data and synthetic data"
+#| fig.width: 6
+#| fig.height: 3
+
+# Select common continuous variables for comparison
+continuous_vars <- c("D", "E", "Z")
+
+combined_df <- bind_rows(
+  df_measured |> select(all_of(continuous_vars), Source) |> mutate(Z = as.numeric(Z)),
+  df_replicated |> select(all_of(continuous_vars), Source) |> mutate(Z = as.numeric(Z))
+) |>
+  pivot_longer(cols=all_of(continuous_vars), names_to="Variable", values_to="Value")
+
+# Plot using ggplot2
+ggplot(combined_df, aes(x=Value, color=Source)) +
+  stat_ecdf(geom="step", linewidth=1) +
+  facet_wrap(~ Variable, scales="free_x") +
+  scale_color_manual(values=c("darkorange", "royalblue")) +
+  labs(
+    title = "Empirical Cumulative Distribution Function (ECDF)",
+    subtitle = "Evaluating structural shifts introduced by missing features",
+    x="Measured Value",
+    y="Cumulative Probability (Fn(x))",
+    color="Dataset Version"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    strip.text=element_text(face="bold", size=11),
+    plot.title=element_text(face="bold", size=14)
+  )
+```
+
+```{r}
+#| label: fig-res2
+#| fig-cap: "Comparison between truth data and synthetic data"
+#| fig.width: 6
+#| fig.height: 3
+
+# Select common continuous variables for comparison
+continuous_vars <- c("D", "E", "Z")
+
+combined_df <- bind_rows(
+  df_truth |> select(all_of(continuous_vars), Source) |> mutate(Z = as.numeric(Z)),
+  df_replicated |> select(all_of(continuous_vars), Source) |> mutate(Z = as.numeric(Z))
+) |>
+  pivot_longer(cols=all_of(continuous_vars), names_to="Variable", values_to="Value")
+
+# Plot using ggplot2
+ggplot(combined_df, aes(x=Value, color=Source)) +
+  stat_ecdf(geom="step", linewidth=1) +
+  facet_wrap(~ Variable, scales="free_x") +
+  scale_color_manual(values=c("darkorange", "royalblue")) +
+  labs(
+    title = "Empirical Cumulative Distribution Function (ECDF)",
+    subtitle = "Evaluating structural shifts introduced by missing features",
+    x="True Value",
+    y="Cumulative Probability (Fn(x))",
+    color="Dataset Version"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    strip.text=element_text(face="bold", size=11),
+    plot.title=element_text(face="bold", size=14)
+  )
+```
+
+When inspecting the resulting multi-panel ECDF plots, pay close attention to the visual gap between the orange and blue step functions:
+
+- Identical Distributions (No Confounding Effects): Variables like $A$ and $B$ which display overlapping curves. This occurs because their distribution parameters were either independent or their structural relationships were not fundamentally altered by ignoring vital parent nodes. The model used to generate the synthetic data is sufficient to replicate the data and suggests that there are no missing (latent) variables that effect their distributions.
+
+- Divergent Distributions (Confounding Bias Introduced): Variables like $C$, $D$, $E$, and $Y$ which display pronounced horizontal offsets and differing slopes between the two curves. Because the latent variables ($U1$, $U2$, and $U3$) were active parent drivers in the true graph, dropping them forces the simulated "Replicated" system to drop multi-modal distributions, changing the distributions.
+
+Missing variables, if they are confounders, will significantly change the interpretation of the data and any machine learning models that are generated from that data.
+
+Comparing the true DAG with the Bayesian Network DAG trained on the measured data illustrates why machine learning does not generate causal models. Note the edges in the Bayesian Network are reversed. The edge $D \rightarrow Z$ is now reversed $D \leftarrow Z$. The edge $E \rightarrow D$ is also now reversed $E \leftarrow D$. And there is an extra link between $Z$ and $E$ ($Z \rightarrow E$).
+
+```{r}
+#| label: fig-compare-dags
+#| fig-cap: "Truth DAG"
+#| fig.width: 6
+#| fig.height: 4
+
+dag_true <- dagify(
+  E ~ I + C,
+  G ~ C,
+  S ~ E + L,
+  M ~ E,
+  D ~ E + M + L + G + J,
+  Z ~ D
+) |> plot_dag(layout="stress") +
+  labs(title="True DAG")
+
+dag_bn <- as.igraph(bn_model) |>
+  graph2dagitty() |>
+  plot_dag(layout="stress") +
+  labs(title="Bayesian Network DAG")
+
+# Display side-by-side
+dag_true + dag_bn
+```
+
+A Bayesian Network’s primary job is to factorize a massive Joint Probability Distribution into smaller, conditional pieces based on a DAG.
+
+When you train the BN on the truth data, its structure learning algorithm (like Hill-Climbing or Tabu search) looked for a DAG that could best recreate the statistical dependencies in your dataset. However, because you removed the confounding factor variables, the BN was forced to find a DAG that could capture those missing relationships through the remaining continuous variables.
+
+In graph theory, different DAGs can represent the exact same conditional independence relationships. These are called Markov Equivalent. For example, the BN engine cannot tell the difference between $X \rightarrow Y\ (X\ causes Y)$ and $X \leftarrow Y\ (Y\ causes\ X)$
+
+Both structures yield the exact same joint distribution P(X,Y). Because the BN only cares about maximizing the likelihood of the data, it will happily flip arrows backward or invent paths to map out the correlation left behind by your missing confounders. It successfully replicates the data because the math behind the probability factorization works, but it fails to identify the true physics of the system.
