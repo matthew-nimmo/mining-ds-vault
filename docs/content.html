@@ -133,6 +133,10 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#scoring-functions" id="toc-scoring-functions" class="nav-link" data-scroll-target="#scoring-functions">Scoring Functions</a></li>
   <li><a href="#exploratory-modelling-with-bayesian-networks" id="toc-exploratory-modelling-with-bayesian-networks" class="nav-link" data-scroll-target="#exploratory-modelling-with-bayesian-networks">Exploratory Modelling with Bayesian Networks</a></li>
   </ul></li>
+  <li><a href="#research" id="toc-research" class="nav-link" data-scroll-target="#research">Research</a>
+  <ul class="collapse">
+  <li><a href="#kriging-with-fuzzy-domain-boundaries" id="toc-kriging-with-fuzzy-domain-boundaries" class="nav-link" data-scroll-target="#kriging-with-fuzzy-domain-boundaries">Kriging with Fuzzy Domain Boundaries</a></li>
+  </ul></li>
   <li><a href="#patterns" id="toc-patterns" class="nav-link" data-scroll-target="#patterns">Patterns</a>
   <ul class="collapse">
   <li><a href="#dags-arent-daggy" id="toc-dags-arent-daggy" class="nav-link" data-scroll-target="#dags-arent-daggy">DAGs aren’t daggy</a></li>
@@ -168,6 +172,19 @@ ul.task-list li input[type="checkbox"] {
 <p><a href="./examples/Titanic-Data-Analysis/titanic-data-analysis.html" class="card-link">Open Example →</a></p>
 </section>
 </section>
+<section id="research" class="level1">
+<h1>Research</h1>
+<p>Research documents my ideas, experiments, mathematical proofs, and algorithms.</p>
+<section id="kriging-with-fuzzy-domain-boundaries" class="level2">
+<h2 class="anchored" data-anchor-id="kriging-with-fuzzy-domain-boundaries">Kriging with Fuzzy Domain Boundaries</h2>
+<p><strong>The Idea that was shelved for 14 years</strong></p>
+<div class="icon icon-innovation">
+
+</div>
+<p>In 2012, standard resource estimation offered only two choices at domain boundaries: hard cut-offs (zero samples outside) or soft buffers (all samples inside treated as 100% equal). When I proposed scaling sample weights continuously based on domain membership, the traditional consensus was sceptical. Fourteen years later, with the rise of non-stationary spatial kernels, inverse-variance penalties, and machine-learning spatial proxies, the mathematics has caught up. Here is the formal proof why discrete fuzzy domain membership works.</p>
+<p><a href="./research/Kriging-Fuzzy-Boundaries/kriging-fuzzy-boundaries.html" class="card-link">Open Research →</a></p>
+</section>
+</section>
 <section id="patterns" class="level1">
 <h1>Patterns</h1>
 <p>Patterns capture reusable modelling structures, data‑quality practices, and analytical motifs that support disciplined thinking.</p>
@@ -178,7 +195,7 @@ ul.task-list li input[type="checkbox"] {
 
 </div>
 <p>DAGs aren’t daggy—they’re the only reliable way to stop fooling ourselves with historical data. As a geometallurgist or data scientist, it’s dangerously easy to introduce hidden selection variables by filtering or comparing data without understanding the causal structure. A simple lab‑A versus lab‑B discrepancy might look like bad test‑work, but a DAG reveals the real culprit: different rock properties driving different outcomes. Filtering out samples, rejecting outliers, or comparing operators without considering geology can quietly distort the dataset and lead to biased models, flawed interpretations, and costly operational mistakes. Strong correlations can also be misread as causes when key variables—like lithology—were never measured. Time and again, the trap is the same: we had the data, we ran the model, and everything made sense until we realised we never checked the DAG. So what is a DAG?</p>
-<p><a href="./patterns/DAG/dag.html" class="card-link">Open Example →</a></p>
+<p><a href="./patterns/DAG/dag.html" class="card-link">Open Pattern →</a></p>
 
 
 </section>

@@ -37,6 +37,18 @@ This is not a collection of scripts. It is a system of thought — a way of work
 
 :::::: card-grid
 ::: card
+<div class="icon icon-innovation"></div>
+
+# Research
+
+## New ideas
+
+Research documents my ideas, experiments, mathematical proofs, and algorithms.
+
+[View Research →](research/research.qmd){.card-link}
+:::
+
+::: card
 <div class="icon icon-examples"></div>
 
 # Examples

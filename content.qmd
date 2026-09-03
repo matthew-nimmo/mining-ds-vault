@@ -11,6 +11,12 @@ Examples show workflows in practice--small, self-contained, and designed to illu
 
 {{< include examples/examples.qmd >}}
 
+# Research
+
+Research documents my ideas, experiments, mathematical proofs, and algorithms.
+
+{{< include research/research.qmd >}}
+
 # Patterns
 
 Patterns capture reusable modelling structures, data‑quality practices, and analytical motifs that support disciplined thinking.

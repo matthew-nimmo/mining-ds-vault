@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>under-construction – mining-ds-vault</title>
+<title>research – mining-ds-vault</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -123,8 +123,14 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#kriging-with-fuzzy-domain-boundaries" id="toc-kriging-with-fuzzy-domain-boundaries" class="nav-link active" data-scroll-target="#kriging-with-fuzzy-domain-boundaries">Kriging with Fuzzy Domain Boundaries</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -132,23 +138,17 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<div class="under-construction">
-<div class="icon icon-engineering">
+<section id="kriging-with-fuzzy-domain-boundaries" class="level2">
+<h2 class="anchored" data-anchor-id="kriging-with-fuzzy-domain-boundaries">Kriging with Fuzzy Domain Boundaries</h2>
+<p><strong>The Idea that was shelved for 14 years</strong></p>
+<div class="icon icon-innovation">
 
 </div>
-<h1 class="uc-title">
-Under Construction
-</h1>
-<p class="uc-text">
-This space is being built — thoughtfully, deliberately, and with care. The vault is evolving into a designed system for modern mining data science.
-</p>
-<p class="uc-text">
-Please check back soon as new workflows, patterns, and examples are added.
-</p>
-<p><a href="../index.html" class="uc-link">Return to Home →</a></p>
-</div>
+<p>In 2012, standard resource estimation offered only two choices at domain boundaries: hard cut-offs (zero samples outside) or soft buffers (all samples inside treated as 100% equal). When I proposed scaling sample weights continuously based on domain membership, the traditional consensus was sceptical. Fourteen years later, with the rise of non-stationary spatial kernels, inverse-variance penalties, and machine-learning spatial proxies, the mathematics has caught up. Here is the formal proof why discrete fuzzy domain membership works.</p>
+<p><a href="../research/Kriging-Fuzzy-Boundaries/kriging-fuzzy-boundaries.html" class="card-link">Open Research →</a></p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

@@ -50,3 +50,5 @@ rsconnect/
 **/*.quarto_ipynb
 .DS_Store
 .positai
+/_freeze
+/_WIP

@@ -1,0 +1,12 @@
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+
+  typst:
+    mainfont: "Spectral"
+    codefont: "Source Code Pro"
+    geometry: "margin=1in"
+    include-in-header: ../../header.typ
