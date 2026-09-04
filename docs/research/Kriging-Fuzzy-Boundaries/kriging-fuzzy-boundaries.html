@@ -196,7 +196,10 @@ window.Quarto = {
    
   <ul>
   <li><a href="#the-challenge" id="toc-the-challenge" class="nav-link active" data-scroll-target="#the-challenge">The challenge</a></li>
-  <li><a href="#the-solution" id="toc-the-solution" class="nav-link" data-scroll-target="#the-solution">The solution</a></li>
+  <li><a href="#the-solution" id="toc-the-solution" class="nav-link" data-scroll-target="#the-solution">The solution</a>
+  <ul class="collapse">
+  <li><a href="#earlier-work" id="toc-earlier-work" class="nav-link" data-scroll-target="#earlier-work">Earlier work</a></li>
+  </ul></li>
   <li><a href="#theoretical-foundations-and-structural-framing" id="toc-theoretical-foundations-and-structural-framing" class="nav-link" data-scroll-target="#theoretical-foundations-and-structural-framing">Theoretical foundations and structural framing</a>
   <ul class="collapse">
   <li><a href="#central-premise" id="toc-central-premise" class="nav-link" data-scroll-target="#central-premise">Central premise</a></li>
@@ -272,7 +275,7 @@ window.Quarto = {
 <div>
   <div class="abstract">
     <div class="block-title">Abstract</div>
-    <p>In the early 2000 when I was first doing Mineral Resource estimation I followed the rule book. I processed the geological data in the standard way, dealing with outliers using the typical clip at a threshold method (98th percentile being common). I happily built complex 3D wireframe models of the geology. And I did spatial estimation using Ordinary Kriging. In 2006 it struck me that doing Ordinary Kriging or any form of kriging was compute expensive. The problem was matrix inversion. This was being done for every sample estimate. I surmised that their must be a way to minimize the cost of the matrix inversion. I started playing with Kalman Filters. In 2012 (and earlier) I surmised that rather than updating the weights, what if there was a way to augment the kriging matrices in such a way that when including a sample it can be switched on or off and the corresponding weights will be equivalent to the kringing weights if the sample was in or out. This lead to the idea of kriging with fuzzy domain boundaries. In 2012, that work stoped. Fourteen years later, I have continued that work. From the fragments of legacy work came a more complete experiment. Now there are three variants that I have tested and have corresponding implementations in Go. The mechanism I proposed in 2012 to deal with hard and soft boundaries also offers a path for dramatically reducing the runtime of Sequential Gaussian Simulations (SGS).</p>
+    <p>In the early 2000 when I was first doing Mineral Resource estimation I followed the rule book. I processed the geological data in the standard way, dealing with outliers using the typical clip at a threshold method (98th percentile being common). I happily built complex 3D wireframe models of the geology. And I did spatial estimation using Ordinary Kriging. In 2006 it struck me that doing Ordinary Kriging or any form of kriging was compute expensive. The problem was matrix inversion. This was being done for every sample estimate. I surmised that their must be a way to minimize the cost of the matrix inversion. I started playing with Kalman Filters. In 2012 (and earlier) I surmised that rather than updating the weights, what if there was a way to augment the kriging matrices in such a way that when including a sample it can be switched on or off and the corresponding weights will be equivalent to the kringing weights if the sample was in or out. This lead to the idea of kriging with fuzzy domain boundaries. In 2012, that work stopped. Fourteen years later, I have continued that work. From the fragments of legacy work came a more complete experiment. Now there are three variants that I have tested and have corresponding implementations in Go. The mechanism I proposed in 2012 to deal with hard and soft boundaries also offers a path for dramatically reducing the runtime of Sequential Gaussian Simulations (SGS).</p>
   </div>
 </div>
 
@@ -304,6 +307,14 @@ window.Quarto = {
 <li><p><strong>Variant B</strong> - Additive variance penalty (<span class="math inline">\(w=k(K+R)^{-1}\)</span>): Introduces a diagonal observation error penalty matrix R, where low membership <span class="math inline">\(u_i \rightarrow 0\)</span> acts as an infinite variance penalty <span class="math inline">\(R_{ii} \rightarrow \infty\)</span>. Use Case: General-purpose resource estimation across soft boundaries, guaranteeing positive definiteness and matrix invertibility under all sample configurations.</p></li>
 <li><p><strong>Variant C</strong> - Post-projection weight scaling (<span class="math inline">\(w=w_{fixed}M\)</span>): Pre-computes unconditioned master weights <span class="math inline">\(w_{fixed}=kK^{-1}\)</span> on a regular grid and post-scales them using a diagonal fuzzy operator matrix <span class="math inline">\(M\)</span>. Use Case: Ultra-fast Sequential Gaussian Simulation (SGS). Bypasses <span class="math inline">\(O(N^3)\)</span> matrix inversions at every random-path simulation node, reducing operations to <span class="math inline">\(O(N)\)</span> vector scaling.</p></li>
 </ul>
+<section id="earlier-work" class="level2">
+<h2 class="anchored" data-anchor-id="earlier-work">Earlier work</h2>
+<p>In the early 2000 when I was first doing Mineral Resource estimation I followed the rule book. I processed the geological data in the standard way, dealing with outliers using the typical clip at a threshold method (98th percentile being common). I happily built complex 3D wireframe models of the geology. And I did spatial estimation using Ordinary Kriging.</p>
+<p>In 2006 it struck me that doing Ordinary Kriging or any form of kriging was compute expensive. The problem was matrix inversion. This was being done for every sample estimate. I surmised that their must be a way to minimize the cost of the matrix inversion. I started playing with Kalman Filters.</p>
+<p>In 2012 (and earlier) I surmised that rather than updating the weights, what if there was a way to augment the kriging matrices in such a way that when including a sample it can be switched on or off and the corresponding weights will be equivalent to the kringing weights if the sample was in or out. This lead to the idea of kriging with fuzzy domain boundaries.</p>
+<p>In 2012, that work stopped.</p>
+<p>This work is based on the earlier work I started in 2006 and then in 2012 work.</p>
+</section>
 </section>
 <section id="theoretical-foundations-and-structural-framing" class="level1">
 <h1>Theoretical foundations and structural framing</h1>
