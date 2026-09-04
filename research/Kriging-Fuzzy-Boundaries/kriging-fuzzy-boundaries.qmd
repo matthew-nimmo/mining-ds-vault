@@ -32,11 +32,11 @@ Fuzzy Domain Kriging (FDK) modifies the linear system equations to damp the spat
 
 Three distinct mathematical variants offer different operational trade-offs:
 
-- **Variant A** - Multiplicative covariance scaling ($w=k(D \cdot K)^{−1}$): Modifies the cross-covariance matrix $K$ directly via an interaction mask matrix $D$, dampening spatial correlations between samples across fuzzy domain boundaries. Use Case: Localised domain boundary estimation where off-diagonal spatial correlations across complex, non-stationary contacts must be explicitly modulated.
+- **Variant A** - Multiplicative covariance scaling ($w=k(D \cdot K)^{-1}$): Modifies the cross-covariance matrix $K$ directly via an interaction mask matrix $D$, dampening spatial correlations between samples across fuzzy domain boundaries. Use Case: Localised domain boundary estimation where off-diagonal spatial correlations across complex, non-stationary contacts must be explicitly modulated.
 
-- **Variant B** - Additive variance penalty ($w=k(K+R)^{−1}$): Introduces a diagonal observation error penalty matrix R, where low membership $u_i \rightarrow 0$ acts as an infinite variance penalty $R_{ii} \rightarrow \infty$. Use Case: General-purpose resource estimation across soft boundaries, guaranteeing positive definiteness and matrix invertibility under all sample configurations.
+- **Variant B** - Additive variance penalty ($w=k(K+R)^{-1}$): Introduces a diagonal observation error penalty matrix R, where low membership $u_i \rightarrow 0$ acts as an infinite variance penalty $R_{ii} \rightarrow \infty$. Use Case: General-purpose resource estimation across soft boundaries, guaranteeing positive definiteness and matrix invertibility under all sample configurations.
 
-- **Variant C** - Post-projection weight scaling ($w=w_{fixed}M$): Pre-computes unconditioned master weights $w_{fixed}=kK^{−1}$ on a regular grid and post-scales them using a diagonal fuzzy operator matrix $M$. Use Case: Ultra-fast Sequential Gaussian Simulation (SGS). Bypasses $O(N^3)$ matrix inversions at every random-path simulation node, reducing operations to $O(N)$ vector scaling.
+- **Variant C** - Post-projection weight scaling ($w=w_{fixed}M$): Pre-computes unconditioned master weights $w_{fixed}=kK^{-1}$ on a regular grid and post-scales them using a diagonal fuzzy operator matrix $M$. Use Case: Ultra-fast Sequential Gaussian Simulation (SGS). Bypasses $O(N^3)$ matrix inversions at every random-path simulation node, reducing operations to $O(N)$ vector scaling.
 
 # Theoretical foundations and structural framing
 
@@ -55,7 +55,7 @@ The proposition that discrete Kriging is a finite projection of an infinite-dime
 In standard OK, the linear system is written as:
 
 $$\begin{bmatrix}K & 1 \\ 1^T & 0\end{bmatrix}\begin{bmatrix}w \\ μ\end{bmatrix}=\begin{bmatrix}k \\ 1\end{bmatrix}$$
-When extending the discrete set of $N$ points to an infinite spatial domain continuous operator $Ω$, the matrix inversion $K^{−1}$ transitions into an integral operator kernel $K^{−1}(x,x′)$.
+When extending the discrete set of $N$ points to an infinite spatial domain continuous operator $Ω$, the matrix inversion $K^{-1}$ transitions into an integral operator kernel $K^{-1}(x,x′)$.
 
 - FDK as a continuous operator: Rather than discarding samples outside an arbitrary radius R, Fuzzy Domain Kriging includes all spatial points by modulating their support via continuous membership functions. This turns the discrete sampling mask into a smooth, spatially continuous field operator.
 
@@ -82,46 +82,37 @@ By relaxing $V(x,x_0)$ to a continuous mapping $V:Ω \rightarrow [0,1]$, FDK bri
 
 ### Domain scaling and operator non-commutativity
 
-When introducing domain decay, scaling, or fuzzy membership matrices $D$, the positioning of the linear transformation matrix or differential spatial operator relative to the inverse covariance matrix $K^{−1}$ dictates whether modification applies to data space, covariance space, or weight space.
+When introducing domain decay, scaling, or fuzzy membership matrices $D$, the positioning of the linear transformation matrix or differential spatial operator relative to the inverse covariance matrix $K^{-1}$ dictates whether modification applies to data space, covariance space, or weight space.
+ 
+#### Post-weighting vs spatial pre-filtering
 
-#### Post-weighting vs spatial pre-filtering ($D(kK^{−1}$) vs $(kK^{−1})D$)
+- $(kK^{-1})D$ (Post-weighting transformation): Modulates the solved spatial weights $w^T=kK^{-1}$ after global inversion. This scales the relative influence of individual sample weights dynamically at the estimation location.
 
-- $(kK^{−1})D$ (Post-weighting transformation): Modulates the solved spatial weights $w^T=kK^{−1}$ after global inversion. This scales the relative influence of individual sample weights dynamically at the estimation location.
+- $D(kK^{-1})$ (Covariance mapping / dual operator): When $D$ acts on the left, it transforms the entire continuous weighting functional. Because matrix and operator multiplication are non-commutative ($D(kK^{-1}) \ne (kK^{-1})D$), pre-multiplying maps the input cross-covariance structure into a transformed manifold prior to inversion, whereas post-multiplying alters the target weight distribution post-inversion.
 
-- $D(kK^{−1})$ (Covariance mapping / dual operator): When $D$ acts on the left, it transforms the entire continuous weighting functional. Because matrix and operator multiplication are non-commutative ($D(kK^{−1}) \ne (kK^{−1})D$), pre-multiplying maps the input cross-covariance structure into a transformed manifold prior to inversion, whereas post-multiplying alters the target weight distribution post-inversion.
+#### Internal covariance modulation vs external covariance scaling
 
-#### Internal covariance modulation ($k(D \cdot K^{−1})$)
+- $k(DK)^{-1}$ (Inversion warp): The matrix $D$ is embedded inside the inversion. This scales the spatial variance manifold directly before inversion, effectively acting as an inverse metric tensor. Rather than scaling sample points independently, $DK^{-1}$ represents a spatially non-stationary covariance distortion. This formulation acts as a regularised pseudo-inverse, where $D$ injects local anisotropy, fuzzy domain decay, or metric space warps directly into the precision matrix (the spatial topology of the inverse problem).
 
-- Mechanism: The operator $D$ scales the inverse kernel matrix directly before interacting with the cross-covariance vector k.
+- $k(DK^{-1})$ (Cross-covariance weight warper): The global precision matrix $K^−1$ is already computed, and $D$ acts as a local operator that scales or rotates the row contributions of the precision matrix prior to inner-product multiplication with the cross-covariance vector $k$.
 
-- Interpretation: Rather than scaling sample points independently, $D \cdot K^{−1}$ represents a spatially non-stationary covariance distortion. This formulation acts as a regularised pseudo-inverse, where $D$ injects local anisotropy, fuzzy domain decay, or metric space warps directly into the precision matrix (the spatial topology of the inverse problem).
-
-### Additive noise, regularisation, and spatial offsets
+#### Additive noise, regularisation, and spatial offsets
 
 The structural placement of an additive operator $D$ distinguishes structural covariance regularisation from post-hoc spatial drift corrections.
 
-$$k(K^{−1}+D) vs (kK^{−1})+D$$
+- $k(K^{-1}+D)$ (Internal matrix regularisation): $D∈\mathbb{R}^{N×N}$ is added directly to the precision matrix $K^{-1}$. Operates as a spatial metric regulariser or generalised Tikhonov perturbation. It modifies the global connectivity between all sample pairs simultaneously. Adding D inside the parentheses acts as a localised spatial variance sink (e.g., accounting for non-stationary sensor noise, micro-scale variance, or variable nugget effect across sub-domains).
 
-#### Internal matrix regularisation ($k(K^{−1}+D)$)
-
-- Mathematical form: $D∈\mathbb{R}^{N×N}$ is added directly to the precision matrix $K^{−1}$.
-
-- Physical interpretation: Operates as a spatial metric regulariser or generalised Tikhonov perturbation. It modifies the global connectivity between all sample pairs simultaneously. Adding D inside the parentheses acts as a localised spatial variance sink (e.g., accounting for non-stationary sensor noise, micro-scale variance, or variable nugget effect across sub-domains).
-
-#### Additive field offset ($(kK^{−1})+D$)
-
-- Mathematical form: $D∈\mathbb{R}^{1×N}$ (or an additive scalar field offset) is appended to the computed weights $w^T=kK^{−1}$.
-
-- Physical interpretation: Represents an explicit spatial bias vector or baseline domain offset. It directly shifts the linear combination of weights without altering the underlying precision matrix structure, functioning as a residual drift model or exogenous forcing term.
+- ($(kK^{-1})+D$) (Additive field offset) $D∈\mathbb{R}^{1×N}$ (or an additive scalar field offset) is appended to the computed weights $w^T=kK^{-1}$. Represents an explicit spatial bias vector or baseline domain offset. It directly shifts the linear combination of weights without altering the underlying precision matrix structure, functioning as a residual drift model or exogenous forcing term.
 
 ### Summary
 
 | Operator Variant | Target Subspace | Structural Role | Physical Analogy |
 |------------------|-----------------|-----------------|------------------|
-| $(kK^{−1})D$ | Weight Space ($w$) | Post-hoc weight scaling / continuous membership decay	Local | fuzzy domain scaling |
-| $k(D \cdot K^{−1})$ | Precision Space ($K^{−1}$) | Metric tensor warping / local precision modulation | Non-stationary manifold distortion |
-| $k(K^{−1}+D)$ | Covariance System | Additive precision regularisation / spatial variance sinks | Variable nugget and localised uncertainty |
-| $(kK^{−1})+D$ | Output Weight Vector | Direct linear weight offset / trend shift | Exogenous drift and spatial bias |
+| $(kK^{-1})D$ | Weight Space ($w$) | Post-hoc weight scaling / continuous membership decay	Local | fuzzy domain scaling |
+| $k(DK^{-1})$ | Cross-Precision Space ($K^{-1}$) | Direct row-scaling of pre-inverted precision matrix | Dynamic sample-to-precision weight projection |
+| $k(DK)^{-1}$ | Covariance Manifold ($K$) | Inverted domain coordinate transform / metric tensor warping | Non-stationary spatial manifold distortion |
+| $k(K^{-1}+D)$ | Covariance System | Additive precision regularisation / spatial variance sinks | Variable nugget and localised uncertainty |
+| $(kK^{-1})+D$ | Output Weight Vector | Direct linear weight offset / trend shift | Exogenous drift and spatial bias |
 
 # Proof
 
@@ -133,7 +124,7 @@ $$\begin{bmatrix}K & 1 \\ 1^T & 0\end{bmatrix}=\begin{bmatrix}k_0 \\ 1\end{bmatr
  
 Where $K$ is the $N×N$ sample covariance matrix, $k$ is the $N×1$ target covariance vector, $w$ is the weight vector, and $μ$ is the Lagrange multiplier enforcing $\sum w_i=1$.
 
-## Proof for Variant A, multiplicative covariance scaling ($w=k(D \cdot K)−1$)
+## Proof for Variant A, multiplicative covariance scaling ($w=k(D \cdot K)^{-1}$)
 
 Let $f=1−u$ be the out-of-domain complement vector. Define the interaction operator matrix $D$ such that off-diagonal entries are scaled by cross-boundary uncertainty while diagonals remain $D_{ii}=1$ to preserve self-variance:
 
@@ -146,13 +137,13 @@ Boundary limits and behaviour:
 1. Full membership ($u_i=1,∀i$):
 
 $$f_i=0 \Longrightarrow D=I\ (Identity Matrix)$$
-$$w=k(I \cdot K)^{−1}=kK^{−1}\ (Exact\ Ordinary\ Kriging)$$
+$$w=k(I \cdot K)^{-1}=kK^{-1}\ (Exact\ Ordinary\ Kriging)$$
 
 2. Zero membership ($u_j=0$):
 
 Row $j$ and Column $j$ of ($D \cdot K$) have off-diagonal entries driven to $0$. Sample $j$ becomes spatially decoupled from all other neighbourhood points, reducing its cross-covariance contribution $k_j \rightarrow 0$ and driving $w_j \rightarrow 0$.
 
-## Proof for Variant B, additive variance penalty ($w=k(K+R)^{−1}$)
+## Proof for Variant B, additive variance penalty ($w=k(K+R)^{-1}$)
 
 Define $R(u)$ as a diagonal penalty matrix with elements:
 
@@ -162,7 +153,7 @@ Boundary limits and behaviour:
 
 1. Full membership ($u_i=1$):
 
-$$R_{ii}(1)=(\frac{1−1}{1}) \cdot σ_{sill}^2=0 \Longrightarrow R(M)=0_{N×N}$$
+$$R_{ii}(1)=(\frac{1-1}{1}) \cdot σ_{sill}^2=0 \Longrightarrow R(M)=0_{N×N}$$
 
 $$w=k(K+0)^{-1}\ (Exact\ Ordinary\ Kriging)$$
 
@@ -184,23 +175,23 @@ The weight for sample $j$ is strictly zeroed out, and the remaining weights $w_{
 
 We seek a diagonal transformation matrix $M=diag(m_1,m_2,…,m_N)$ such that:
 
-$$w_C=w_{fixed}M=kK^{−1}M$$
+$$w_C=w_{fixed}M=kK^{-1}M$$
 
 To solve for $M$ in terms of Variants $A$ and $B$, set the weight vectors equal:
 
-$$kK^{−1}M=k(K+R)^{−1}$$
+$$kK^{-1}M=k(K+R)^{-1}$$
  
 Right-multiplying both sides by the inverse terms yields:
 
-$$M=K \cdot (K+R)^{−1}$$
+$$M=K \cdot (K+R)^{-1}$$
  
-Using the Woodbury Matrix Identity on $(K+R)−1$:
+Using the Woodbury Matrix Identity on $(K+R)^{-1}$:
 
-$$(K+R)^{−1}=K^{−1}−K^{−1}(R^{−1}+K^{−1})^{−1}K^{−1}$$
+$$(K+R)^{-1}=K^{-1}−K^{-1}(R^{-1}+K^{-1})^{-1}K^{-1}$$
  
 Substitute this back into the expression for $M$:
 
-$$M=K \left[K^{−1}−K^{−1}(R^{−1}+K^{−1})^{−1}K^{−1} \right]=I−(R^{−1}+K^{−1})^{−1}K^{−1}$$
+$$M=K \left[K^{-1}−K^{-1}(R^{-1}+K^{-1})^{-1}K^{-1} \right]=I−(R^{-1}+K^{-1})^{-1}K^{-1}$$
  
 ### Unbiasedness normalisation and fast approximation for SGS
 
@@ -208,7 +199,7 @@ Because post-scaling breaks the sum-to-one constraint ($\sum (w_{fixed}M)_i \ne 
 
 $$w_{final}=\frac{w_{fixed}M}{1^T(w_{fixed}M)}$$
 
-The SGS approximation: On a regular simulation grid, $w_{fixed}=kK−1$ is calculated once for a fully populated master template. For any node visited along the random path, $M$ is approximated directly as $M≈diag(u_1,u_2,…,u_N)$.
+The SGS approximation: On a regular simulation grid, $w_{fixed}=kK^{-1}$ is calculated once for a fully populated master template. For any node visited along the random path, $M$ is approximated directly as $M≈diag(u_1,u_2,…,u_N)$.
 
 This eliminates matrix inversions during simulation:
 
@@ -242,55 +233,56 @@ By going through this exercise in modifying (extending) the kriging formulation,
 
 ### Unified framework formulation
 
-By treating standard Ordinary Kriging ($w^T=kK^{−1}$) as a baseline global continuous field, all local non-stationarities, domain decays, spatial offsets, and observation uncertainties aggregate into a single matrix equation:
+By treating standard Ordinary Kriging ($w^T=kK^{-1}$) as a baseline global continuous field, all local non-stationarities, domain decays, spatial offsets, and observation uncertainties aggregate into a single matrix equation.
 
-$$w_{adapted}^T=A+Mk(K+R)^{−1}V+D$$
+Up until now the notation has been rather random. The matrix labels were selected simply to have different letters to represent the matrices. A more formal notation, standard notation is required to avoid notation collisions (such as $A$ for area/design matrix, $B$ for drift coefficients, or $C$ for the spatial covariance matrix itself), the modifiers can be assigned letters that explicitly reflect their geometric or algebraic role using the Greek alphabet:
 
-Where the constituent operators map across four functional layers:
+$$w_{USE}^T=Ξ+ΦkΨ(ΓKΩ+Λ)^{-1}Θ+Δ$$
 
-- Global base field ($kK^{−1}$): The pre-computed continuous spatial covariance structure built once over the global domain $Ω$.
+Or, if sticking to standard Latin typography for standard Go package API readability:
 
-- Covariance-space modifiers ($R$): Spatial variance sinks, variable measurement errors, or non-stationary noise metrics added directly to the precision operator.
+$$w_{USE}^T=U_0+M_{in}kM_{out}(LKR+S)^{-1}W_{in}+U_1$$
 
-- Weight/sample-space modifiers ($M$,$V$): Local domain masks, anisotropy stretch tensors, or fuzzy continuous membership decay matrices modulating inputs ($V$) and outputs ($M$).
+| Proposed Symbol | Functional Name | Matrix Role | Mathematical / Geostatistical Purpose | Identity State (Null) |
+|-----------------|-----------------|-------------|---------------------------------------|-----------------------|
+| $L$ (or $Γ$) | Left-Covariance Warper | Matrix Pre-Multiplier ($\mathbb{R}^{N×N}$) | Scales/warps spatial anisotropy prior to global covariance evaluation. | $I_{N×N}$ |
+| $R$ (or $Ω$) | Right-Covariance Warper | Matrix Post-Multiplier ($\mathbb{R}^{N×N}$) | Spatial domain transform mapping output sample coordinate spaces. | $I_{N×N}$ |
+| $S$ (or $Λ$) | Spatial Variance Sink | Additive Noise/Nugget ($\mathbb{R}^{N×N}$) | Injects non-stationary nugget variances, sensor errors, or diagonal regularisers. | $0_{N×N}$ |
+| $W_{in}$ (or $Θ$) | Input Weight Modulator | Matrix Post-Multiplier ($\mathbb{R}^{N×N}$) | FDK continuous membership scaling and domain decay ($μ_i∈[0,1]$). | $I_{N×N}$ |
+| $M_{in}$ (or $Φ$) | Global Field Amplitude | Scalar Multiplier ($\mathbb{R}^{1×1}$) | Scales global field magnitude or acts as an overall gain parameter. | $1$ |
+| $M_{out}$ (or $Ψ$) | Cross-Covariance Operator | Matrix Pre-Multiplier ($\mathbb{R}^{N×N}$) | Warps point-to-estimation cross-covariance topology before precision-matrix projection ($k(DK^{−1})$) | $I_{1×1}=1$ |
+| $U_0$ (or $Ξ$) | Baseline Prior Offset | Additive Vector Pre-Shift ($\mathbb{R}^{1×N}$) | Global baseline structural weight shift (must satisfy $\sum{U_{0,i}}=0$). | $0_{1×N}$ |
+| $U_1$ (or $Δ$) | Residual Spatial Bias | Additive Vector Post-Shift ($\mathbb{R}^{1×N}$) | Localised trend drift or ML residual bias correction ($\sum{U_{1,i}}=0$). | $0_{1×N}$ |
 
-- Additive spatial trends ($A$,$D$): Global baseline shifts ($A$) and localised spatial bias offsets ($D$).
-
-### Identity mapping and architectural collapse
+: Modifier matrix breakdown and typographical mapping {#tbl-notation}
 
 A core property of this framework is its algebraic fall-back. When any local modulation matrix is omitted or undefined, it defaults to its corresponding identity operator ($I$ for multiplicative structures or $0$ for additive structures).
 
-$$A \rightarrow 0_{1×N}\ (No\ pre-offset)$$
+Architectural advantages of this form:
 
-$$M \rightarrow I_{1×1}=1\ (No\ output\ spatial\ warping)$$
+- Explicit separation of linear operations: Multiplicative operators ($L$,$R$,$W_{in}$) model spatial non-linearity, directional stretching, and fuzzy continuous boundaries, while additive operators ($S$,$U_0$,$U_1$) process high-speed $O(N^2)$ noise and drift adjustments.
 
-$$R \rightarrow 0_{N×N}\ (Homoscedastic\ /\ zero\ added\ covariance\ noise)$$
+- Numerically stable Go implementation: Modifiers act purely as forward matrix multiplications or vector additions. The core system matrix $K$ is inverted (or decomposed via Cholesky factor $LL^T$) once. Updating local estimations reduces to fastBLAS routines without any risk of singular matrix errors at runtime.
 
-$$V \rightarrow I_{N×N}\ (Full\ sample\ domain\ inclusion\ /\ uniform\ weight\ scaling)$$
+Where the constituent operators map across four functional layers:
 
-$$D \rightarrow 0_{1×N}\ (No\ post-hoc\ spatial\ bias\ offset)$$
-Under global identity evaluation, the framework reduces directly to standard Ordinary Kriging:
+- Global base field ($kK^{-1}$): The pre-computed continuous spatial covariance structure built once over the global domain $Ω$.
 
-$$w_{adapted}^T=0+(1)k(K+0)^{−1}I+0=kK{−1}$$
- 
+- Covariance-space modifiers ($M_{out}$,$L$,$R$,$S$): Spatial variance sinks, variable measurement errors, or non-stationary noise metrics added directly to the precision operator.
+
+- Weight/sample-space modifiers ($M_{in}$,$W_{in}$): Local domain masks, anisotropy stretch tensors, or fuzzy continuous membership decay matrices modulating inputs ($W_{in}$) and outputs ($M$).
+
+- Additive spatial trends ($U_0$,$U_1$): Global baseline shifts ($U_0$) and localised spatial bias offsets ($U_1$).
+
 ### Computational paradigm
 
 The single-build global pre-inversion formulation fundamentally alters the computational efficiency of spatial estimation across scale:
 
-- Build once, evaluate everywhere: The expensive matrix inversion $(K+R)^{−1}$ or continuous operator factorisation is performed once globally (or updated via low-rank Woodbury updates if local R perturbations are sparse).
+- Build once, evaluate everywhere: The expensive matrix inversion $(LKR+S)^{-1}$ or continuous operator factorisation is performed once globally (or updated via low-rank Woodbury updates if local $S$ perturbations are sparse).
 
 - Decoupled system execution: In large-scale simulations or multi-point spatial interpolation, the background global covariance tensor remains frozen in memory.
 
-- Local adaptation via fast tensor products: Local domain variations (e.g., FDK variants, localised dynamic search windows, micro-climate barriers) are applied instantaneously at runtime by multiplying the cached global operator $kK^{−1}$ by sparse local transformation matrices $V$, $R$, and $D$.
-
-| Model Variant | Operator Configuration | Physical / Operational Interpretation |
-|---------------|------------------------|---------------------------------------|
-| Ordinary Kriging (OK) | $A=0$,$M=I$,$R=0$,$V=I$,$D=0$ | Static, stationary spatial model with hard search boundaries. |
-| Fuzzy Domain Kriging (FDK) | $V=diag(μ_1,…,μ_N)$,$R=0$,$D=0$ | Continuous inclusion of all global points modulated by spatial membership $μ_i$. |
-| Nugget-Varying Kriging | $R=diag(σ_1^2,…,σ_N^2)$,$V=I$ | Non-stationary measurement uncertainty across heterogeneous sensors. |
-| Drift-Adjusted FDK | $V=Fuzzy\ Mask$,$D=b_{trend}$ | Local fuzzy domain decay combined with exogenous residual bias correction. |
-
-: Specialisations {#tble-variants}
+- Local adaptation via fast tensor products: Local domain variations (e.g., FDK variants, localised dynamic search windows, micro-climate barriers) are applied instantaneously at runtime by multiplying the cached global operator $(LKR+S)^{-1}$ by sparse local transformation matrices $M_{in}$, $M_{out}$, and $W_{in}$.
 
 ### Integration with ML/AI trend models (hybrid estimation)
 
@@ -308,13 +300,13 @@ $$\hat{Z}(x_0)= \underbrace{f_{ML}(x_0)}_{Global\ Trend\ (AI/ML)} + \underbrace{
 
 Many traditionally complex, standalone Kriging variants can now be refactored as lightweight config profiles over the same unified solver core:
 
-- Universal / Trend Kriging: Replaced by assigning polynomial drift or ML trend outputs directly to the additive offsets ($A$,$D$).
+- Universal / Trend Kriging: Replaced by assigning polynomial drift or ML trend outputs directly to the additive offsets ($U_0$,$U_1$).
 
-- Heteroscedastic / Variable-Nugget Kriging: Replaced by passing point-specific error variances into the diagonal of $R$.
+- Heteroscedastic / Variable-Nugget Kriging: Replaced by passing point-specific error variances into the diagonal of $S$.
 
-- Indicator and Fuzzy Kriging: Replaced by setting continuous membership function profiles in $V$.
+- Indicator and Fuzzy Kriging: Replaced by setting continuous membership function profiles in $W$.
 
-- Moving Window Kriging: Replaced by applying a continuous spatial decay matrix $V$ instead of truncating data matrices and re-inverting $K$ at every step.
+- Moving Window Kriging: Replaced by applying a continuous spatial decay matrix $W$ instead of truncating data matrices and re-inverting $(LKR+S)$ at every step.
 
 This framework transforms what would usually be separate, complex Go packages into a single core engine with pluggable modifier interfaces.
 
@@ -322,37 +314,9 @@ This framework transforms what would usually be separate, complex Go packages in
 
 - Computational complexity difference: Matrix addition scales at $O(N^2)$ linear memory access overhead, whereas standard matrix multiplication scales at $O(N*3)$ (or $O(N^{2.81}$) via Strassen's algorithm). For an $N×N$ matrix, addition is roughly 100× to 1000× faster depending on CPU cache alignment and vectorisation.
 
-- Preserving convexity ($\sum{w_i}=1$): Multiplicative scaling allows row-stochastic or scalar normalization factors to naturally preserve or proportionally re-scale the sum of weights. Additive modifiers ($A$,$D$) shift values uniformly. To maintain $\sum{w_i}=1$ under additive terms, any added offset vector $D_i$ must satisfy $\sum{D_i}=0$ (a zero-sum mean-neutral perturbation).
+- Preserving convexity ($\sum{w_i}=1$): Multiplicative scaling allows row-stochastic or scalar normalization factors to naturally preserve or proportionally re-scale the sum of weights. Additive modifiers ($U_0$,$U_1$) shift values uniformly. To maintain $\sum{w_i}=1$ under additive terms, any added offset vector $U_{1,i}$ must satisfy $\sum{U_{1,i}}=0$ (a zero-sum mean-neutral perturbation).
 
 - Inversion-free modifiers: Keeping all dynamic modifier matrices outside the inversion operator—or restricting modifications inside the inverse to additive noise matrices—avoids re-evaluating $O(N^3)$ inversions and prevents ill-conditioned matrix instabilities during runtime evaluations.
-
-### Matrix nomenclature and canonical notation
-
-Up until now the notation has been rather random. The matrix labels were selected simply to have different letters to represent the matrices. A more formal notation, standard notation is required to avoid notation collisions (such as $A$ for area/design matrix, $B$ for drift coefficients, or $C$ for the spatial covariance matrix itself), the modifiers can be assigned letters that explicitly reflect their geometric or algebraic role using the Greek alphabet:
-
-$$w_{USE}^T=Ξ+Φk(ΓKΩ+Λ)^{−1}Ψ+Δ$$
-
-Or, if sticking to standard Latin typography for standard Go package API readability:
-
-$$w_{USE}^T=U_0+M_{out}k(LKR+S)^{−1}W_{in}+U_1$$
-
-| Proposed Symbol | Functional Name | Matrix Role | Mathematical / Geostatistical Purpose | Identity State (Null) |
-|-----------------|-----------------|-------------|---------------------------------------|-----------------------|
-| $L$ (or $Γ$) | Left-Covariance Warper | Matrix Pre-Multiplier | Scales/warps spatial anisotropy prior to global covariance evaluation. | $I_{N×N}$ |
-| $R$ (or $Ω$) | Right-Covariance Warper | Matrix Post-Multiplier | Spatial domain transform mapping output sample coordinate spaces. | $I_{N×N}$ |
-| $S$ (or $Λ$) | Spatial Variance Sink | Additive Noise/Nugget | Injects non-stationary nugget variances, sensor errors, or diagonal regularisers. | $0_{N×N}$ |
-| $W_{in}$ (or $Ψ$) | Input Weight Modulator | Dynamic Sample Mask | FDK continuous membership scaling and domain decay ($μ_i∈[0,1]$). | $I_{N×N}$ |
-| $M_{out}$ (or $Φ$) | Output Field Scalar | Spatial Weight Projection | Post-inversion manifold projection or output dimension scaling. | $I_{1×1}=1$ |
-| $U_0$ (or $Ξ$) | Baseline Prior Offset | Additive Vector Pre-Shift | Global baseline structural weight shift (must satisfy $\sum{U_{0,i}}=0$). | $0_{1×N}$ |
-| $U_1$ (or $Δ$) | Residual Spatial Bias | Additive Vector Post-Shift | Localised trend drift or ML residual bias correction ($\sum{U_{1,i}}=0$). | $0_{1×N}$ |
-
-: Modifier matrix breakdown and typographical mapping {#tbl-notation}
-
-Architectural advantages of this form:
-
-- Explicit separation of linear operations: Multiplicative operators ($L$,$R$,$W_{in}$) model spatial non-linearity, directional stretching, and fuzzy continuous boundaries, while additive operators ($S$,$U_0$,$U_1$) process high-speed $O(N^2)$ noise and drift adjustments.
-
-- Numerically stable Go implementation: Modifiers act purely as forward matrix multiplications or vector additions. The core system matrix $K$ is inverted (or decomposed via Cholesky factor $LL^T$) once. Updating local estimations reduces to fastBLAS routines without any risk of singular matrix errors at runtime.
 
 ### Software architecture
 
@@ -376,8 +340,4 @@ type LocalModifier interface {
 }
 ```
 
-The design keeps the memory footprint low and execution speeds high:
-
-- The Core ($kK^{-1}$): Heavy linear algebra (matrix inversion, continuous variogram evaluation) happens once during initialization.
-
-- The Middleware ($M$, $V$, $R$, $D$): Light, matrix-vector or diagonal tensor operations executed dynamically per target point.
+The design keeps the memory footprint low and execution speeds high.

@@ -204,15 +204,14 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#local-adaptation-via-operator-decomposition-g-cdot-v" id="toc-local-adaptation-via-operator-decomposition-g-cdot-v" class="nav-link" data-scroll-target="#local-adaptation-via-operator-decomposition-g-cdot-v">Local adaptation via operator decomposition (<span class="math inline">\(G \cdot V\)</span>)</a></li>
   <li><a href="#domain-scaling-and-operator-non-commutativity" id="toc-domain-scaling-and-operator-non-commutativity" class="nav-link" data-scroll-target="#domain-scaling-and-operator-non-commutativity">Domain scaling and operator non-commutativity</a></li>
-  <li><a href="#additive-noise-regularisation-and-spatial-offsets" id="toc-additive-noise-regularisation-and-spatial-offsets" class="nav-link" data-scroll-target="#additive-noise-regularisation-and-spatial-offsets">Additive noise, regularisation, and spatial offsets</a></li>
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
   </ul></li>
   </ul></li>
   <li><a href="#proof" id="toc-proof" class="nav-link" data-scroll-target="#proof">Proof</a>
   <ul class="collapse">
   <li><a href="#ordinary-kriging-baseline" id="toc-ordinary-kriging-baseline" class="nav-link" data-scroll-target="#ordinary-kriging-baseline">Ordinary Kriging baseline</a></li>
-  <li><a href="#proof-for-variant-a-multiplicative-covariance-scaling-wkd-cdot-k1" id="toc-proof-for-variant-a-multiplicative-covariance-scaling-wkd-cdot-k1" class="nav-link" data-scroll-target="#proof-for-variant-a-multiplicative-covariance-scaling-wkd-cdot-k1">Proof for Variant A, multiplicative covariance scaling (<span class="math inline">\(w=k(D \cdot K)−1\)</span>)</a></li>
-  <li><a href="#proof-for-variant-b-additive-variance-penalty-wkkr1" id="toc-proof-for-variant-b-additive-variance-penalty-wkkr1" class="nav-link" data-scroll-target="#proof-for-variant-b-additive-variance-penalty-wkkr1">Proof for Variant B, additive variance penalty (<span class="math inline">\(w=k(K+R)^{−1}\)</span>)</a></li>
+  <li><a href="#proof-for-variant-a-multiplicative-covariance-scaling-wkd-cdot-k-1" id="toc-proof-for-variant-a-multiplicative-covariance-scaling-wkd-cdot-k-1" class="nav-link" data-scroll-target="#proof-for-variant-a-multiplicative-covariance-scaling-wkd-cdot-k-1">Proof for Variant A, multiplicative covariance scaling (<span class="math inline">\(w=k(D \cdot K)^{-1}\)</span>)</a></li>
+  <li><a href="#proof-for-variant-b-additive-variance-penalty-wkkr-1" id="toc-proof-for-variant-b-additive-variance-penalty-wkkr-1" class="nav-link" data-scroll-target="#proof-for-variant-b-additive-variance-penalty-wkkr-1">Proof for Variant B, additive variance penalty (<span class="math inline">\(w=k(K+R)^{-1}\)</span>)</a></li>
   <li><a href="#proof-for-variant-c-post-projection-weight-scaling-and-equivalence" id="toc-proof-for-variant-c-post-projection-weight-scaling-and-equivalence" class="nav-link" data-scroll-target="#proof-for-variant-c-post-projection-weight-scaling-and-equivalence">Proof for Variant C, post-projection weight scaling and equivalence</a>
   <ul class="collapse">
   <li><a href="#unbiasedness-normalisation-and-fast-approximation-for-sgs" id="toc-unbiasedness-normalisation-and-fast-approximation-for-sgs" class="nav-link" data-scroll-target="#unbiasedness-normalisation-and-fast-approximation-for-sgs">Unbiasedness normalisation and fast approximation for SGS</a></li>
@@ -224,12 +223,10 @@ window.Quarto = {
   <li><a href="#the-universal-spatial-estimator-use-framework" id="toc-the-universal-spatial-estimator-use-framework" class="nav-link" data-scroll-target="#the-universal-spatial-estimator-use-framework">The Universal Spatial Estimator (USE) framework</a>
   <ul class="collapse">
   <li><a href="#unified-framework-formulation" id="toc-unified-framework-formulation" class="nav-link" data-scroll-target="#unified-framework-formulation">Unified framework formulation</a></li>
-  <li><a href="#identity-mapping-and-architectural-collapse" id="toc-identity-mapping-and-architectural-collapse" class="nav-link" data-scroll-target="#identity-mapping-and-architectural-collapse">Identity mapping and architectural collapse</a></li>
   <li><a href="#computational-paradigm" id="toc-computational-paradigm" class="nav-link" data-scroll-target="#computational-paradigm">Computational paradigm</a></li>
   <li><a href="#integration-with-mlai-trend-models-hybrid-estimation" id="toc-integration-with-mlai-trend-models-hybrid-estimation" class="nav-link" data-scroll-target="#integration-with-mlai-trend-models-hybrid-estimation">Integration with ML/AI trend models (hybrid estimation)</a></li>
   <li><a href="#simplification-of-complex-geostatistical-formulations" id="toc-simplification-of-complex-geostatistical-formulations" class="nav-link" data-scroll-target="#simplification-of-complex-geostatistical-formulations">Simplification of complex geostatistical formulations</a></li>
   <li><a href="#computational-mechanics-and-structural-insights" id="toc-computational-mechanics-and-structural-insights" class="nav-link" data-scroll-target="#computational-mechanics-and-structural-insights">Computational mechanics and structural insights</a></li>
-  <li><a href="#matrix-nomenclature-and-canonical-notation" id="toc-matrix-nomenclature-and-canonical-notation" class="nav-link" data-scroll-target="#matrix-nomenclature-and-canonical-notation">Matrix nomenclature and canonical notation</a></li>
   <li><a href="#software-architecture" id="toc-software-architecture" class="nav-link" data-scroll-target="#software-architecture">Software architecture</a></li>
   </ul></li>
   </ul></li>
@@ -303,9 +300,9 @@ window.Quarto = {
 <p>Fuzzy Domain Kriging (FDK) modifies the linear system equations to damp the spatial covariance or weight contribution of samples based on their domain membership <span class="math inline">\(u_i∈[0,1]\)</span>, where <span class="math inline">\(u_i=1\)</span> indicates complete domain membership and <span class="math inline">\(u_i=0\)</span> indicates total exclusion.</p>
 <p>Three distinct mathematical variants offer different operational trade-offs:</p>
 <ul>
-<li><p><strong>Variant A</strong> - Multiplicative covariance scaling (<span class="math inline">\(w=k(D \cdot K)^{−1}\)</span>): Modifies the cross-covariance matrix <span class="math inline">\(K\)</span> directly via an interaction mask matrix <span class="math inline">\(D\)</span>, dampening spatial correlations between samples across fuzzy domain boundaries. Use Case: Localised domain boundary estimation where off-diagonal spatial correlations across complex, non-stationary contacts must be explicitly modulated.</p></li>
-<li><p><strong>Variant B</strong> - Additive variance penalty (<span class="math inline">\(w=k(K+R)^{−1}\)</span>): Introduces a diagonal observation error penalty matrix R, where low membership <span class="math inline">\(u_i \rightarrow 0\)</span> acts as an infinite variance penalty <span class="math inline">\(R_{ii} \rightarrow \infty\)</span>. Use Case: General-purpose resource estimation across soft boundaries, guaranteeing positive definiteness and matrix invertibility under all sample configurations.</p></li>
-<li><p><strong>Variant C</strong> - Post-projection weight scaling (<span class="math inline">\(w=w_{fixed}M\)</span>): Pre-computes unconditioned master weights <span class="math inline">\(w_{fixed}=kK^{−1}\)</span> on a regular grid and post-scales them using a diagonal fuzzy operator matrix <span class="math inline">\(M\)</span>. Use Case: Ultra-fast Sequential Gaussian Simulation (SGS). Bypasses <span class="math inline">\(O(N^3)\)</span> matrix inversions at every random-path simulation node, reducing operations to <span class="math inline">\(O(N)\)</span> vector scaling.</p></li>
+<li><p><strong>Variant A</strong> - Multiplicative covariance scaling (<span class="math inline">\(w=k(D \cdot K)^{-1}\)</span>): Modifies the cross-covariance matrix <span class="math inline">\(K\)</span> directly via an interaction mask matrix <span class="math inline">\(D\)</span>, dampening spatial correlations between samples across fuzzy domain boundaries. Use Case: Localised domain boundary estimation where off-diagonal spatial correlations across complex, non-stationary contacts must be explicitly modulated.</p></li>
+<li><p><strong>Variant B</strong> - Additive variance penalty (<span class="math inline">\(w=k(K+R)^{-1}\)</span>): Introduces a diagonal observation error penalty matrix R, where low membership <span class="math inline">\(u_i \rightarrow 0\)</span> acts as an infinite variance penalty <span class="math inline">\(R_{ii} \rightarrow \infty\)</span>. Use Case: General-purpose resource estimation across soft boundaries, guaranteeing positive definiteness and matrix invertibility under all sample configurations.</p></li>
+<li><p><strong>Variant C</strong> - Post-projection weight scaling (<span class="math inline">\(w=w_{fixed}M\)</span>): Pre-computes unconditioned master weights <span class="math inline">\(w_{fixed}=kK^{-1}\)</span> on a regular grid and post-scales them using a diagonal fuzzy operator matrix <span class="math inline">\(M\)</span>. Use Case: Ultra-fast Sequential Gaussian Simulation (SGS). Bypasses <span class="math inline">\(O(N^3)\)</span> matrix inversions at every random-path simulation node, reducing operations to <span class="math inline">\(O(N)\)</span> vector scaling.</p></li>
 </ul>
 </section>
 <section id="theoretical-foundations-and-structural-framing" class="level1">
@@ -320,7 +317,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="the-continuous-limit-from-discrete-matrices-to-infinite-fields">The continuous limit, from discrete matrices to infinite fields</h2>
 <p>The proposition that discrete Kriging is a finite projection of an infinite-dimensional field aligns directly with functional analysis and Gaussian Process (GP) regression over continuous domain spaces.</p>
 <p>In standard OK, the linear system is written as:</p>
-<p><span class="math display">\[\begin{bmatrix}K &amp; 1 \\ 1^T &amp; 0\end{bmatrix}\begin{bmatrix}w \\ μ\end{bmatrix}=\begin{bmatrix}k \\ 1\end{bmatrix}\]</span> When extending the discrete set of <span class="math inline">\(N\)</span> points to an infinite spatial domain continuous operator <span class="math inline">\(Ω\)</span>, the matrix inversion <span class="math inline">\(K^{−1}\)</span> transitions into an integral operator kernel <span class="math inline">\(K^{−1}(x,x′)\)</span>.</p>
+<p><span class="math display">\[\begin{bmatrix}K &amp; 1 \\ 1^T &amp; 0\end{bmatrix}\begin{bmatrix}w \\ μ\end{bmatrix}=\begin{bmatrix}k \\ 1\end{bmatrix}\]</span> When extending the discrete set of <span class="math inline">\(N\)</span> points to an infinite spatial domain continuous operator <span class="math inline">\(Ω\)</span>, the matrix inversion <span class="math inline">\(K^{-1}\)</span> transitions into an integral operator kernel <span class="math inline">\(K^{-1}(x,x′)\)</span>.</p>
 <ul>
 <li><p>FDK as a continuous operator: Rather than discarding samples outside an arbitrary radius R, Fuzzy Domain Kriging includes all spatial points by modulating their support via continuous membership functions. This turns the discrete sampling mask into a smooth, spatially continuous field operator.</p></li>
 <li><p>The Global Model (<span class="math inline">\(G\)</span>): <span class="math inline">\(G(x)\)</span> represents the infinite spatial correlation field across the entire domain <span class="math inline">\(Ω\)</span>, defined by the global covariance topology and stationary kernel properties.</p></li>
@@ -342,38 +339,27 @@ window.Quarto = {
 </section>
 <section id="domain-scaling-and-operator-non-commutativity" class="level3">
 <h3 class="anchored" data-anchor-id="domain-scaling-and-operator-non-commutativity">Domain scaling and operator non-commutativity</h3>
-<p>When introducing domain decay, scaling, or fuzzy membership matrices <span class="math inline">\(D\)</span>, the positioning of the linear transformation matrix or differential spatial operator relative to the inverse covariance matrix <span class="math inline">\(K^{−1}\)</span> dictates whether modification applies to data space, covariance space, or weight space.</p>
-<section id="post-weighting-vs-spatial-pre-filtering-dkk1-vs-kk1d" class="level4">
-<h4 class="anchored" data-anchor-id="post-weighting-vs-spatial-pre-filtering-dkk1-vs-kk1d">Post-weighting vs spatial pre-filtering (<span class="math inline">\(D(kK^{−1}\)</span>) vs <span class="math inline">\((kK^{−1})D\)</span>)</h4>
+<p>When introducing domain decay, scaling, or fuzzy membership matrices <span class="math inline">\(D\)</span>, the positioning of the linear transformation matrix or differential spatial operator relative to the inverse covariance matrix <span class="math inline">\(K^{-1}\)</span> dictates whether modification applies to data space, covariance space, or weight space.</p>
+<section id="post-weighting-vs-spatial-pre-filtering" class="level4">
+<h4 class="anchored" data-anchor-id="post-weighting-vs-spatial-pre-filtering">Post-weighting vs spatial pre-filtering</h4>
 <ul>
-<li><p><span class="math inline">\((kK^{−1})D\)</span> (Post-weighting transformation): Modulates the solved spatial weights <span class="math inline">\(w^T=kK^{−1}\)</span> after global inversion. This scales the relative influence of individual sample weights dynamically at the estimation location.</p></li>
-<li><p><span class="math inline">\(D(kK^{−1})\)</span> (Covariance mapping / dual operator): When <span class="math inline">\(D\)</span> acts on the left, it transforms the entire continuous weighting functional. Because matrix and operator multiplication are non-commutative (<span class="math inline">\(D(kK^{−1}) \ne (kK^{−1})D\)</span>), pre-multiplying maps the input cross-covariance structure into a transformed manifold prior to inversion, whereas post-multiplying alters the target weight distribution post-inversion.</p></li>
+<li><p><span class="math inline">\((kK^{-1})D\)</span> (Post-weighting transformation): Modulates the solved spatial weights <span class="math inline">\(w^T=kK^{-1}\)</span> after global inversion. This scales the relative influence of individual sample weights dynamically at the estimation location.</p></li>
+<li><p><span class="math inline">\(D(kK^{-1})\)</span> (Covariance mapping / dual operator): When <span class="math inline">\(D\)</span> acts on the left, it transforms the entire continuous weighting functional. Because matrix and operator multiplication are non-commutative (<span class="math inline">\(D(kK^{-1}) \ne (kK^{-1})D\)</span>), pre-multiplying maps the input cross-covariance structure into a transformed manifold prior to inversion, whereas post-multiplying alters the target weight distribution post-inversion.</p></li>
 </ul>
 </section>
-<section id="internal-covariance-modulation-kd-cdot-k1" class="level4">
-<h4 class="anchored" data-anchor-id="internal-covariance-modulation-kd-cdot-k1">Internal covariance modulation (<span class="math inline">\(k(D \cdot K^{−1})\)</span>)</h4>
+<section id="internal-covariance-modulation-vs-external-covariance-scaling" class="level4">
+<h4 class="anchored" data-anchor-id="internal-covariance-modulation-vs-external-covariance-scaling">Internal covariance modulation vs external covariance scaling</h4>
 <ul>
-<li><p>Mechanism: The operator <span class="math inline">\(D\)</span> scales the inverse kernel matrix directly before interacting with the cross-covariance vector k.</p></li>
-<li><p>Interpretation: Rather than scaling sample points independently, <span class="math inline">\(D \cdot K^{−1}\)</span> represents a spatially non-stationary covariance distortion. This formulation acts as a regularised pseudo-inverse, where <span class="math inline">\(D\)</span> injects local anisotropy, fuzzy domain decay, or metric space warps directly into the precision matrix (the spatial topology of the inverse problem).</p></li>
+<li><p><span class="math inline">\(k(DK)^{-1}\)</span> (Inversion warp): The matrix <span class="math inline">\(D\)</span> is embedded inside the inversion. This scales the spatial variance manifold directly before inversion, effectively acting as an inverse metric tensor. Rather than scaling sample points independently, <span class="math inline">\(DK^{-1}\)</span> represents a spatially non-stationary covariance distortion. This formulation acts as a regularised pseudo-inverse, where <span class="math inline">\(D\)</span> injects local anisotropy, fuzzy domain decay, or metric space warps directly into the precision matrix (the spatial topology of the inverse problem).</p></li>
+<li><p><span class="math inline">\(k(DK^{-1})\)</span> (Cross-covariance weight warper): The global precision matrix <span class="math inline">\(K^−1\)</span> is already computed, and <span class="math inline">\(D\)</span> acts as a local operator that scales or rotates the row contributions of the precision matrix prior to inner-product multiplication with the cross-covariance vector <span class="math inline">\(k\)</span>.</p></li>
 </ul>
 </section>
-</section>
-<section id="additive-noise-regularisation-and-spatial-offsets" class="level3">
-<h3 class="anchored" data-anchor-id="additive-noise-regularisation-and-spatial-offsets">Additive noise, regularisation, and spatial offsets</h3>
+<section id="additive-noise-regularisation-and-spatial-offsets" class="level4">
+<h4 class="anchored" data-anchor-id="additive-noise-regularisation-and-spatial-offsets">Additive noise, regularisation, and spatial offsets</h4>
 <p>The structural placement of an additive operator <span class="math inline">\(D\)</span> distinguishes structural covariance regularisation from post-hoc spatial drift corrections.</p>
-<p><span class="math display">\[k(K^{−1}+D) vs (kK^{−1})+D\]</span></p>
-<section id="internal-matrix-regularisation-kk1d" class="level4">
-<h4 class="anchored" data-anchor-id="internal-matrix-regularisation-kk1d">Internal matrix regularisation (<span class="math inline">\(k(K^{−1}+D)\)</span>)</h4>
 <ul>
-<li><p>Mathematical form: <span class="math inline">\(D∈\mathbb{R}^{N×N}\)</span> is added directly to the precision matrix <span class="math inline">\(K^{−1}\)</span>.</p></li>
-<li><p>Physical interpretation: Operates as a spatial metric regulariser or generalised Tikhonov perturbation. It modifies the global connectivity between all sample pairs simultaneously. Adding D inside the parentheses acts as a localised spatial variance sink (e.g., accounting for non-stationary sensor noise, micro-scale variance, or variable nugget effect across sub-domains).</p></li>
-</ul>
-</section>
-<section id="additive-field-offset-kk1d" class="level4">
-<h4 class="anchored" data-anchor-id="additive-field-offset-kk1d">Additive field offset (<span class="math inline">\((kK^{−1})+D\)</span>)</h4>
-<ul>
-<li><p>Mathematical form: <span class="math inline">\(D∈\mathbb{R}^{1×N}\)</span> (or an additive scalar field offset) is appended to the computed weights <span class="math inline">\(w^T=kK^{−1}\)</span>.</p></li>
-<li><p>Physical interpretation: Represents an explicit spatial bias vector or baseline domain offset. It directly shifts the linear combination of weights without altering the underlying precision matrix structure, functioning as a residual drift model or exogenous forcing term.</p></li>
+<li><p><span class="math inline">\(k(K^{-1}+D)\)</span> (Internal matrix regularisation): <span class="math inline">\(D∈\mathbb{R}^{N×N}\)</span> is added directly to the precision matrix <span class="math inline">\(K^{-1}\)</span>. Operates as a spatial metric regulariser or generalised Tikhonov perturbation. It modifies the global connectivity between all sample pairs simultaneously. Adding D inside the parentheses acts as a localised spatial variance sink (e.g., accounting for non-stationary sensor noise, micro-scale variance, or variable nugget effect across sub-domains).</p></li>
+<li><p>(<span class="math inline">\((kK^{-1})+D\)</span>) (Additive field offset) <span class="math inline">\(D∈\mathbb{R}^{1×N}\)</span> (or an additive scalar field offset) is appended to the computed weights <span class="math inline">\(w^T=kK^{-1}\)</span>. Represents an explicit spatial bias vector or baseline domain offset. It directly shifts the linear combination of weights without altering the underlying precision matrix structure, functioning as a residual drift model or exogenous forcing term.</p></li>
 </ul>
 </section>
 </section>
@@ -396,25 +382,31 @@ window.Quarto = {
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\((kK^{−1})D\)</span></td>
+<td><span class="math inline">\((kK^{-1})D\)</span></td>
 <td>Weight Space (<span class="math inline">\(w\)</span>)</td>
 <td>Post-hoc weight scaling / continuous membership decay Local</td>
 <td>fuzzy domain scaling</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(k(D \cdot K^{−1})\)</span></td>
-<td>Precision Space (<span class="math inline">\(K^{−1}\)</span>)</td>
-<td>Metric tensor warping / local precision modulation</td>
-<td>Non-stationary manifold distortion</td>
+<td><span class="math inline">\(k(DK^{-1})\)</span></td>
+<td>Cross-Precision Space (<span class="math inline">\(K^{-1}\)</span>)</td>
+<td>Direct row-scaling of pre-inverted precision matrix</td>
+<td>Dynamic sample-to-precision weight projection</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(k(K^{−1}+D)\)</span></td>
+<td><span class="math inline">\(k(DK)^{-1}\)</span></td>
+<td>Covariance Manifold (<span class="math inline">\(K\)</span>)</td>
+<td>Inverted domain coordinate transform / metric tensor warping</td>
+<td>Non-stationary spatial manifold distortion</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(k(K^{-1}+D)\)</span></td>
 <td>Covariance System</td>
 <td>Additive precision regularisation / spatial variance sinks</td>
 <td>Variable nugget and localised uncertainty</td>
 </tr>
-<tr class="even">
-<td><span class="math inline">\((kK^{−1})+D\)</span></td>
+<tr class="odd">
+<td><span class="math inline">\((kK^{-1})+D\)</span></td>
 <td>Output Weight Vector</td>
 <td>Direct linear weight offset / trend shift</td>
 <td>Exogenous drift and spatial bias</td>
@@ -432,8 +424,8 @@ window.Quarto = {
 <p><span class="math display">\[\begin{bmatrix}K &amp; 1 \\ 1^T &amp; 0\end{bmatrix}=\begin{bmatrix}k_0 \\ 1\end{bmatrix} \Longrightarrow w_{aug} = K_{aug}^{-1}k_{aug}\]</span></p>
 <p>Where <span class="math inline">\(K\)</span> is the <span class="math inline">\(N×N\)</span> sample covariance matrix, <span class="math inline">\(k\)</span> is the <span class="math inline">\(N×1\)</span> target covariance vector, <span class="math inline">\(w\)</span> is the weight vector, and <span class="math inline">\(μ\)</span> is the Lagrange multiplier enforcing <span class="math inline">\(\sum w_i=1\)</span>.</p>
 </section>
-<section id="proof-for-variant-a-multiplicative-covariance-scaling-wkd-cdot-k1" class="level2">
-<h2 class="anchored" data-anchor-id="proof-for-variant-a-multiplicative-covariance-scaling-wkd-cdot-k1">Proof for Variant A, multiplicative covariance scaling (<span class="math inline">\(w=k(D \cdot K)−1\)</span>)</h2>
+<section id="proof-for-variant-a-multiplicative-covariance-scaling-wkd-cdot-k-1" class="level2">
+<h2 class="anchored" data-anchor-id="proof-for-variant-a-multiplicative-covariance-scaling-wkd-cdot-k-1">Proof for Variant A, multiplicative covariance scaling (<span class="math inline">\(w=k(D \cdot K)^{-1}\)</span>)</h2>
 <p>Let <span class="math inline">\(f=1−u\)</span> be the out-of-domain complement vector. Define the interaction operator matrix <span class="math inline">\(D\)</span> such that off-diagonal entries are scaled by cross-boundary uncertainty while diagonals remain <span class="math inline">\(D_{ii}=1\)</span> to preserve self-variance:</p>
 <p><span class="math display">\[D=I+(d_1 \cdot d_2) \odot (1−I)\]</span></p>
 <p>Where <span class="math inline">\(d_1,d_2\)</span> scale cross-covariance elements <span class="math inline">\(K_{ij}\)</span> proportionally to <span class="math inline">\(u_iu_j\)</span>.</p>
@@ -441,21 +433,21 @@ window.Quarto = {
 <ol type="1">
 <li>Full membership (<span class="math inline">\(u_i=1,∀i\)</span>):</li>
 </ol>
-<p><span class="math display">\[f_i=0 \Longrightarrow D=I\ (Identity Matrix)\]</span> <span class="math display">\[w=k(I \cdot K)^{−1}=kK^{−1}\ (Exact\ Ordinary\ Kriging)\]</span></p>
+<p><span class="math display">\[f_i=0 \Longrightarrow D=I\ (Identity Matrix)\]</span> <span class="math display">\[w=k(I \cdot K)^{-1}=kK^{-1}\ (Exact\ Ordinary\ Kriging)\]</span></p>
 <ol start="2" type="1">
 <li>Zero membership (<span class="math inline">\(u_j=0\)</span>):</li>
 </ol>
 <p>Row <span class="math inline">\(j\)</span> and Column <span class="math inline">\(j\)</span> of (<span class="math inline">\(D \cdot K\)</span>) have off-diagonal entries driven to <span class="math inline">\(0\)</span>. Sample <span class="math inline">\(j\)</span> becomes spatially decoupled from all other neighbourhood points, reducing its cross-covariance contribution <span class="math inline">\(k_j \rightarrow 0\)</span> and driving <span class="math inline">\(w_j \rightarrow 0\)</span>.</p>
 </section>
-<section id="proof-for-variant-b-additive-variance-penalty-wkkr1" class="level2">
-<h2 class="anchored" data-anchor-id="proof-for-variant-b-additive-variance-penalty-wkkr1">Proof for Variant B, additive variance penalty (<span class="math inline">\(w=k(K+R)^{−1}\)</span>)</h2>
+<section id="proof-for-variant-b-additive-variance-penalty-wkkr-1" class="level2">
+<h2 class="anchored" data-anchor-id="proof-for-variant-b-additive-variance-penalty-wkkr-1">Proof for Variant B, additive variance penalty (<span class="math inline">\(w=k(K+R)^{-1}\)</span>)</h2>
 <p>Define <span class="math inline">\(R(u)\)</span> as a diagonal penalty matrix with elements:</p>
 <p><span class="math display">\[R_{ii}(u_i)=\left( \frac{1-u_i}{u_i} \right) \cdot σ_{sill}^2\]</span></p>
 <p>Boundary limits and behaviour:</p>
 <ol type="1">
 <li>Full membership (<span class="math inline">\(u_i=1\)</span>):</li>
 </ol>
-<p><span class="math display">\[R_{ii}(1)=(\frac{1−1}{1}) \cdot σ_{sill}^2=0 \Longrightarrow R(M)=0_{N×N}\]</span></p>
+<p><span class="math display">\[R_{ii}(1)=(\frac{1-1}{1}) \cdot σ_{sill}^2=0 \Longrightarrow R(M)=0_{N×N}\]</span></p>
 <p><span class="math display">\[w=k(K+0)^{-1}\ (Exact\ Ordinary\ Kriging)\]</span></p>
 <ol start="2" type="1">
 <li>Zero membership (<span class="math inline">\(u_j=0\)</span> for sample <span class="math inline">\(j\)</span>):</li>
@@ -470,20 +462,20 @@ window.Quarto = {
 <section id="proof-for-variant-c-post-projection-weight-scaling-and-equivalence" class="level2">
 <h2 class="anchored" data-anchor-id="proof-for-variant-c-post-projection-weight-scaling-and-equivalence">Proof for Variant C, post-projection weight scaling and equivalence</h2>
 <p>We seek a diagonal transformation matrix <span class="math inline">\(M=diag(m_1,m_2,…,m_N)\)</span> such that:</p>
-<p><span class="math display">\[w_C=w_{fixed}M=kK^{−1}M\]</span></p>
+<p><span class="math display">\[w_C=w_{fixed}M=kK^{-1}M\]</span></p>
 <p>To solve for <span class="math inline">\(M\)</span> in terms of Variants <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span>, set the weight vectors equal:</p>
-<p><span class="math display">\[kK^{−1}M=k(K+R)^{−1}\]</span></p>
+<p><span class="math display">\[kK^{-1}M=k(K+R)^{-1}\]</span></p>
 <p>Right-multiplying both sides by the inverse terms yields:</p>
-<p><span class="math display">\[M=K \cdot (K+R)^{−1}\]</span></p>
-<p>Using the Woodbury Matrix Identity on <span class="math inline">\((K+R)−1\)</span>:</p>
-<p><span class="math display">\[(K+R)^{−1}=K^{−1}−K^{−1}(R^{−1}+K^{−1})^{−1}K^{−1}\]</span></p>
+<p><span class="math display">\[M=K \cdot (K+R)^{-1}\]</span></p>
+<p>Using the Woodbury Matrix Identity on <span class="math inline">\((K+R)^{-1}\)</span>:</p>
+<p><span class="math display">\[(K+R)^{-1}=K^{-1}−K^{-1}(R^{-1}+K^{-1})^{-1}K^{-1}\]</span></p>
 <p>Substitute this back into the expression for <span class="math inline">\(M\)</span>:</p>
-<p><span class="math display">\[M=K \left[K^{−1}−K^{−1}(R^{−1}+K^{−1})^{−1}K^{−1} \right]=I−(R^{−1}+K^{−1})^{−1}K^{−1}\]</span></p>
+<p><span class="math display">\[M=K \left[K^{-1}−K^{-1}(R^{-1}+K^{-1})^{-1}K^{-1} \right]=I−(R^{-1}+K^{-1})^{-1}K^{-1}\]</span></p>
 <section id="unbiasedness-normalisation-and-fast-approximation-for-sgs" class="level3">
 <h3 class="anchored" data-anchor-id="unbiasedness-normalisation-and-fast-approximation-for-sgs">Unbiasedness normalisation and fast approximation for SGS</h3>
 <p>Because post-scaling breaks the sum-to-one constraint (<span class="math inline">\(\sum (w_{fixed}M)_i \ne 1\)</span>), we normalise by the scalar sum:</p>
 <p><span class="math display">\[w_{final}=\frac{w_{fixed}M}{1^T(w_{fixed}M)}\]</span></p>
-<p>The SGS approximation: On a regular simulation grid, <span class="math inline">\(w_{fixed}=kK−1\)</span> is calculated once for a fully populated master template. For any node visited along the random path, <span class="math inline">\(M\)</span> is approximated directly as <span class="math inline">\(M≈diag(u_1,u_2,…,u_N)\)</span>.</p>
+<p>The SGS approximation: On a regular simulation grid, <span class="math inline">\(w_{fixed}=kK^{-1}\)</span> is calculated once for a fully populated master template. For any node visited along the random path, <span class="math inline">\(M\)</span> is approximated directly as <span class="math inline">\(M≈diag(u_1,u_2,…,u_N)\)</span>.</p>
 <p>This eliminates matrix inversions during simulation:</p>
 <p><span class="math display">\[w_{SGS}=\frac{w_{fixed} \odot u}{1^T(w_{fixed} \odot u)}\]</span></p>
 <p>At <span class="math inline">\(u_j=1\)</span>: Sample retains its pre-computed weight <span class="math inline">\(w_j\)</span>. At <span class="math inline">\(u_j=0\)</span>: Sample weight drops instantly to 0.</p>
@@ -516,107 +508,11 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="the-universal-spatial-estimator-use-framework">The Universal Spatial Estimator (USE) framework</h2>
 <section id="unified-framework-formulation" class="level3">
 <h3 class="anchored" data-anchor-id="unified-framework-formulation">Unified framework formulation</h3>
-<p>By treating standard Ordinary Kriging (<span class="math inline">\(w^T=kK^{−1}\)</span>) as a baseline global continuous field, all local non-stationarities, domain decays, spatial offsets, and observation uncertainties aggregate into a single matrix equation:</p>
-<p><span class="math display">\[w_{adapted}^T=A+Mk(K+R)^{−1}V+D\]</span></p>
-<p>Where the constituent operators map across four functional layers:</p>
-<ul>
-<li><p>Global base field (<span class="math inline">\(kK^{−1}\)</span>): The pre-computed continuous spatial covariance structure built once over the global domain <span class="math inline">\(Ω\)</span>.</p></li>
-<li><p>Covariance-space modifiers (<span class="math inline">\(R\)</span>): Spatial variance sinks, variable measurement errors, or non-stationary noise metrics added directly to the precision operator.</p></li>
-<li><p>Weight/sample-space modifiers (<span class="math inline">\(M\)</span>,<span class="math inline">\(V\)</span>): Local domain masks, anisotropy stretch tensors, or fuzzy continuous membership decay matrices modulating inputs (<span class="math inline">\(V\)</span>) and outputs (<span class="math inline">\(M\)</span>).</p></li>
-<li><p>Additive spatial trends (<span class="math inline">\(A\)</span>,<span class="math inline">\(D\)</span>): Global baseline shifts (<span class="math inline">\(A\)</span>) and localised spatial bias offsets (<span class="math inline">\(D\)</span>).</p></li>
-</ul>
-</section>
-<section id="identity-mapping-and-architectural-collapse" class="level3">
-<h3 class="anchored" data-anchor-id="identity-mapping-and-architectural-collapse">Identity mapping and architectural collapse</h3>
-<p>A core property of this framework is its algebraic fall-back. When any local modulation matrix is omitted or undefined, it defaults to its corresponding identity operator (<span class="math inline">\(I\)</span> for multiplicative structures or <span class="math inline">\(0\)</span> for additive structures).</p>
-<p><span class="math display">\[A \rightarrow 0_{1×N}\ (No\ pre-offset)\]</span></p>
-<p><span class="math display">\[M \rightarrow I_{1×1}=1\ (No\ output\ spatial\ warping)\]</span></p>
-<p><span class="math display">\[R \rightarrow 0_{N×N}\ (Homoscedastic\ /\ zero\ added\ covariance\ noise)\]</span></p>
-<p><span class="math display">\[V \rightarrow I_{N×N}\ (Full\ sample\ domain\ inclusion\ /\ uniform\ weight\ scaling)\]</span></p>
-<p><span class="math display">\[D \rightarrow 0_{1×N}\ (No\ post-hoc\ spatial\ bias\ offset)\]</span> Under global identity evaluation, the framework reduces directly to standard Ordinary Kriging:</p>
-<p><span class="math display">\[w_{adapted}^T=0+(1)k(K+0)^{−1}I+0=kK{−1}\]</span></p>
-</section>
-<section id="computational-paradigm" class="level3">
-<h3 class="anchored" data-anchor-id="computational-paradigm">Computational paradigm</h3>
-<p>The single-build global pre-inversion formulation fundamentally alters the computational efficiency of spatial estimation across scale:</p>
-<ul>
-<li><p>Build once, evaluate everywhere: The expensive matrix inversion <span class="math inline">\((K+R)^{−1}\)</span> or continuous operator factorisation is performed once globally (or updated via low-rank Woodbury updates if local R perturbations are sparse).</p></li>
-<li><p>Decoupled system execution: In large-scale simulations or multi-point spatial interpolation, the background global covariance tensor remains frozen in memory.</p></li>
-<li><p>Local adaptation via fast tensor products: Local domain variations (e.g., FDK variants, localised dynamic search windows, micro-climate barriers) are applied instantaneously at runtime by multiplying the cached global operator <span class="math inline">\(kK^{−1}\)</span> by sparse local transformation matrices <span class="math inline">\(V\)</span>, <span class="math inline">\(R\)</span>, and <span class="math inline">\(D\)</span>.</p></li>
-</ul>
-<table class="caption-top table">
-<caption>Specialisations {#tble-variants}</caption>
-<colgroup>
-<col style="width: 19%">
-<col style="width: 30%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Model Variant</th>
-<th>Operator Configuration</th>
-<th>Physical / Operational Interpretation</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Ordinary Kriging (OK)</td>
-<td><span class="math inline">\(A=0\)</span>,<span class="math inline">\(M=I\)</span>,<span class="math inline">\(R=0\)</span>,<span class="math inline">\(V=I\)</span>,<span class="math inline">\(D=0\)</span></td>
-<td>Static, stationary spatial model with hard search boundaries.</td>
-</tr>
-<tr class="even">
-<td>Fuzzy Domain Kriging (FDK)</td>
-<td><span class="math inline">\(V=diag(μ_1,…,μ_N)\)</span>,<span class="math inline">\(R=0\)</span>,<span class="math inline">\(D=0\)</span></td>
-<td>Continuous inclusion of all global points modulated by spatial membership <span class="math inline">\(μ_i\)</span>.</td>
-</tr>
-<tr class="odd">
-<td>Nugget-Varying Kriging</td>
-<td><span class="math inline">\(R=diag(σ_1^2,…,σ_N^2)\)</span>,<span class="math inline">\(V=I\)</span></td>
-<td>Non-stationary measurement uncertainty across heterogeneous sensors.</td>
-</tr>
-<tr class="even">
-<td>Drift-Adjusted FDK</td>
-<td><span class="math inline">\(V=Fuzzy\ Mask\)</span>,<span class="math inline">\(D=b_{trend}\)</span></td>
-<td>Local fuzzy domain decay combined with exogenous residual bias correction.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="integration-with-mlai-trend-models-hybrid-estimation" class="level3">
-<h3 class="anchored" data-anchor-id="integration-with-mlai-trend-models-hybrid-estimation">Integration with ML/AI trend models (hybrid estimation)</h3>
-<p>Refactoring geostatistics around this framework fits naturally with modern Machine Learning residual pipelines (e.g., Random Forest Kriging, Neural Spatial Process Models):</p>
-<p><span class="math display">\[\hat{Z}(x_0)= \underbrace{f_{ML}(x_0)}_{Global\ Trend\ (AI/ML)} + \underbrace{w_{USE}^T(Z−f_{ML}(X))}_{Spatially\ Adapted\ Residual}\]</span></p>
-<ul>
-<li><p>ML Model (<span class="math inline">\(f_{ML}\)</span>) captures high-dimensional, non-linear global trends across complex feature spaces (e.g., elevation, remote sensing data, meteorological covariates).</p></li>
-<li><p>USE Framework (<span class="math inline">\(w_{USE}\)</span>) models the spatial autocorrelation of the residuals (<span class="math inline">\(e=Z−f_{ML}\)</span>).</p></li>
-<li><p>Synergy with Modifiers: If ML uncertainty varies across regions, the local variance matrix <span class="math inline">\(R\)</span> dynamically absorbs model variance sinks, down-weighting residuals in regions where the ML model is uncertain.</p></li>
-</ul>
-</section>
-<section id="simplification-of-complex-geostatistical-formulations" class="level3">
-<h3 class="anchored" data-anchor-id="simplification-of-complex-geostatistical-formulations">Simplification of complex geostatistical formulations</h3>
-<p>Many traditionally complex, standalone Kriging variants can now be refactored as lightweight config profiles over the same unified solver core:</p>
-<ul>
-<li><p>Universal / Trend Kriging: Replaced by assigning polynomial drift or ML trend outputs directly to the additive offsets (<span class="math inline">\(A\)</span>,<span class="math inline">\(D\)</span>).</p></li>
-<li><p>Heteroscedastic / Variable-Nugget Kriging: Replaced by passing point-specific error variances into the diagonal of <span class="math inline">\(R\)</span>.</p></li>
-<li><p>Indicator and Fuzzy Kriging: Replaced by setting continuous membership function profiles in <span class="math inline">\(V\)</span>.</p></li>
-<li><p>Moving Window Kriging: Replaced by applying a continuous spatial decay matrix <span class="math inline">\(V\)</span> instead of truncating data matrices and re-inverting <span class="math inline">\(K\)</span> at every step.</p></li>
-</ul>
-<p>This framework transforms what would usually be separate, complex Go packages into a single core engine with pluggable modifier interfaces.</p>
-</section>
-<section id="computational-mechanics-and-structural-insights" class="level3">
-<h3 class="anchored" data-anchor-id="computational-mechanics-and-structural-insights">Computational mechanics and structural insights</h3>
-<ul>
-<li><p>Computational complexity difference: Matrix addition scales at <span class="math inline">\(O(N^2)\)</span> linear memory access overhead, whereas standard matrix multiplication scales at <span class="math inline">\(O(N*3)\)</span> (or <span class="math inline">\(O(N^{2.81}\)</span>) via Strassen’s algorithm). For an <span class="math inline">\(N×N\)</span> matrix, addition is roughly 100× to 1000× faster depending on CPU cache alignment and vectorisation.</p></li>
-<li><p>Preserving convexity (<span class="math inline">\(\sum{w_i}=1\)</span>): Multiplicative scaling allows row-stochastic or scalar normalization factors to naturally preserve or proportionally re-scale the sum of weights. Additive modifiers (<span class="math inline">\(A\)</span>,<span class="math inline">\(D\)</span>) shift values uniformly. To maintain <span class="math inline">\(\sum{w_i}=1\)</span> under additive terms, any added offset vector <span class="math inline">\(D_i\)</span> must satisfy <span class="math inline">\(\sum{D_i}=0\)</span> (a zero-sum mean-neutral perturbation).</p></li>
-<li><p>Inversion-free modifiers: Keeping all dynamic modifier matrices outside the inversion operator—or restricting modifications inside the inverse to additive noise matrices—avoids re-evaluating <span class="math inline">\(O(N^3)\)</span> inversions and prevents ill-conditioned matrix instabilities during runtime evaluations.</p></li>
-</ul>
-</section>
-<section id="matrix-nomenclature-and-canonical-notation" class="level3">
-<h3 class="anchored" data-anchor-id="matrix-nomenclature-and-canonical-notation">Matrix nomenclature and canonical notation</h3>
+<p>By treating standard Ordinary Kriging (<span class="math inline">\(w^T=kK^{-1}\)</span>) as a baseline global continuous field, all local non-stationarities, domain decays, spatial offsets, and observation uncertainties aggregate into a single matrix equation.</p>
 <p>Up until now the notation has been rather random. The matrix labels were selected simply to have different letters to represent the matrices. A more formal notation, standard notation is required to avoid notation collisions (such as <span class="math inline">\(A\)</span> for area/design matrix, <span class="math inline">\(B\)</span> for drift coefficients, or <span class="math inline">\(C\)</span> for the spatial covariance matrix itself), the modifiers can be assigned letters that explicitly reflect their geometric or algebraic role using the Greek alphabet:</p>
-<p><span class="math display">\[w_{USE}^T=Ξ+Φk(ΓKΩ+Λ)^{−1}Ψ+Δ\]</span></p>
+<p><span class="math display">\[w_{USE}^T=Ξ+ΦkΨ(ΓKΩ+Λ)^{-1}Θ+Δ\]</span></p>
 <p>Or, if sticking to standard Latin typography for standard Go package API readability:</p>
-<p><span class="math display">\[w_{USE}^T=U_0+M_{out}k(LKR+S)^{−1}W_{in}+U_1\]</span></p>
+<p><span class="math display">\[w_{USE}^T=U_0+M_{in}kM_{out}(LKR+S)^{-1}W_{in}+U_1\]</span></p>
 <div id="tbl-notation" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-notation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -644,49 +540,56 @@ Table&nbsp;1: Modifier matrix breakdown and typographical mapping
 <tr class="odd">
 <td><span class="math inline">\(L\)</span> (or <span class="math inline">\(Γ\)</span>)</td>
 <td>Left-Covariance Warper</td>
-<td>Matrix Pre-Multiplier</td>
+<td>Matrix Pre-Multiplier (<span class="math inline">\(\mathbb{R}^{N×N}\)</span>)</td>
 <td>Scales/warps spatial anisotropy prior to global covariance evaluation.</td>
 <td><span class="math inline">\(I_{N×N}\)</span></td>
 </tr>
 <tr class="even">
 <td><span class="math inline">\(R\)</span> (or <span class="math inline">\(Ω\)</span>)</td>
 <td>Right-Covariance Warper</td>
-<td>Matrix Post-Multiplier</td>
+<td>Matrix Post-Multiplier (<span class="math inline">\(\mathbb{R}^{N×N}\)</span>)</td>
 <td>Spatial domain transform mapping output sample coordinate spaces.</td>
 <td><span class="math inline">\(I_{N×N}\)</span></td>
 </tr>
 <tr class="odd">
 <td><span class="math inline">\(S\)</span> (or <span class="math inline">\(Λ\)</span>)</td>
 <td>Spatial Variance Sink</td>
-<td>Additive Noise/Nugget</td>
+<td>Additive Noise/Nugget (<span class="math inline">\(\mathbb{R}^{N×N}\)</span>)</td>
 <td>Injects non-stationary nugget variances, sensor errors, or diagonal regularisers.</td>
 <td><span class="math inline">\(0_{N×N}\)</span></td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(W_{in}\)</span> (or <span class="math inline">\(Ψ\)</span>)</td>
+<td><span class="math inline">\(W_{in}\)</span> (or <span class="math inline">\(Θ\)</span>)</td>
 <td>Input Weight Modulator</td>
-<td>Dynamic Sample Mask</td>
+<td>Matrix Post-Multiplier (<span class="math inline">\(\mathbb{R}^{N×N}\)</span>)</td>
 <td>FDK continuous membership scaling and domain decay (<span class="math inline">\(μ_i∈[0,1]\)</span>).</td>
 <td><span class="math inline">\(I_{N×N}\)</span></td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(M_{out}\)</span> (or <span class="math inline">\(Φ\)</span>)</td>
-<td>Output Field Scalar</td>
-<td>Spatial Weight Projection</td>
-<td>Post-inversion manifold projection or output dimension scaling.</td>
-<td><span class="math inline">\(I_{1×1}=1\)</span></td>
+<td><span class="math inline">\(M_{in}\)</span> (or <span class="math inline">\(Φ\)</span>)</td>
+<td>Global Field Amplitude</td>
+<td>Scalar Multiplier (<span class="math inline">\(\mathbb{R}^{1×1}\)</span>)</td>
+<td>Scales global field magnitude or acts as an overall gain parameter.</td>
+<td><span class="math inline">\(1\)</span></td>
 </tr>
 <tr class="even">
+<td><span class="math inline">\(M_{out}\)</span> (or <span class="math inline">\(Ψ\)</span>)</td>
+<td>Cross-Covariance Operator</td>
+<td>Matrix Pre-Multiplier (<span class="math inline">\(\mathbb{R}^{N×N}\)</span>)</td>
+<td>Warps point-to-estimation cross-covariance topology before precision-matrix projection (<span class="math inline">\(k(DK^{−1})\)</span>)</td>
+<td><span class="math inline">\(I_{1×1}=1\)</span></td>
+</tr>
+<tr class="odd">
 <td><span class="math inline">\(U_0\)</span> (or <span class="math inline">\(Ξ\)</span>)</td>
 <td>Baseline Prior Offset</td>
-<td>Additive Vector Pre-Shift</td>
+<td>Additive Vector Pre-Shift (<span class="math inline">\(\mathbb{R}^{1×N}\)</span>)</td>
 <td>Global baseline structural weight shift (must satisfy <span class="math inline">\(\sum{U_{0,i}}=0\)</span>).</td>
 <td><span class="math inline">\(0_{1×N}\)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span class="math inline">\(U_1\)</span> (or <span class="math inline">\(Δ\)</span>)</td>
 <td>Residual Spatial Bias</td>
-<td>Additive Vector Post-Shift</td>
+<td>Additive Vector Post-Shift (<span class="math inline">\(\mathbb{R}^{1×N}\)</span>)</td>
 <td>Localised trend drift or ML residual bias correction (<span class="math inline">\(\sum{U_{1,i}}=0\)</span>).</td>
 <td><span class="math inline">\(0_{1×N}\)</span></td>
 </tr>
@@ -695,10 +598,56 @@ Table&nbsp;1: Modifier matrix breakdown and typographical mapping
 </div>
 </figure>
 </div>
+<p>A core property of this framework is its algebraic fall-back. When any local modulation matrix is omitted or undefined, it defaults to its corresponding identity operator (<span class="math inline">\(I\)</span> for multiplicative structures or <span class="math inline">\(0\)</span> for additive structures).</p>
 <p>Architectural advantages of this form:</p>
 <ul>
 <li><p>Explicit separation of linear operations: Multiplicative operators (<span class="math inline">\(L\)</span>,<span class="math inline">\(R\)</span>,<span class="math inline">\(W_{in}\)</span>) model spatial non-linearity, directional stretching, and fuzzy continuous boundaries, while additive operators (<span class="math inline">\(S\)</span>,<span class="math inline">\(U_0\)</span>,<span class="math inline">\(U_1\)</span>) process high-speed <span class="math inline">\(O(N^2)\)</span> noise and drift adjustments.</p></li>
 <li><p>Numerically stable Go implementation: Modifiers act purely as forward matrix multiplications or vector additions. The core system matrix <span class="math inline">\(K\)</span> is inverted (or decomposed via Cholesky factor <span class="math inline">\(LL^T\)</span>) once. Updating local estimations reduces to fastBLAS routines without any risk of singular matrix errors at runtime.</p></li>
+</ul>
+<p>Where the constituent operators map across four functional layers:</p>
+<ul>
+<li><p>Global base field (<span class="math inline">\(kK^{-1}\)</span>): The pre-computed continuous spatial covariance structure built once over the global domain <span class="math inline">\(Ω\)</span>.</p></li>
+<li><p>Covariance-space modifiers (<span class="math inline">\(M_{out}\)</span>,<span class="math inline">\(L\)</span>,<span class="math inline">\(R\)</span>,<span class="math inline">\(S\)</span>): Spatial variance sinks, variable measurement errors, or non-stationary noise metrics added directly to the precision operator.</p></li>
+<li><p>Weight/sample-space modifiers (<span class="math inline">\(M_{in}\)</span>,<span class="math inline">\(W_{in}\)</span>): Local domain masks, anisotropy stretch tensors, or fuzzy continuous membership decay matrices modulating inputs (<span class="math inline">\(W_{in}\)</span>) and outputs (<span class="math inline">\(M\)</span>).</p></li>
+<li><p>Additive spatial trends (<span class="math inline">\(U_0\)</span>,<span class="math inline">\(U_1\)</span>): Global baseline shifts (<span class="math inline">\(U_0\)</span>) and localised spatial bias offsets (<span class="math inline">\(U_1\)</span>).</p></li>
+</ul>
+</section>
+<section id="computational-paradigm" class="level3">
+<h3 class="anchored" data-anchor-id="computational-paradigm">Computational paradigm</h3>
+<p>The single-build global pre-inversion formulation fundamentally alters the computational efficiency of spatial estimation across scale:</p>
+<ul>
+<li><p>Build once, evaluate everywhere: The expensive matrix inversion <span class="math inline">\((LKR+S)^{-1}\)</span> or continuous operator factorisation is performed once globally (or updated via low-rank Woodbury updates if local <span class="math inline">\(S\)</span> perturbations are sparse).</p></li>
+<li><p>Decoupled system execution: In large-scale simulations or multi-point spatial interpolation, the background global covariance tensor remains frozen in memory.</p></li>
+<li><p>Local adaptation via fast tensor products: Local domain variations (e.g., FDK variants, localised dynamic search windows, micro-climate barriers) are applied instantaneously at runtime by multiplying the cached global operator <span class="math inline">\((LKR+S)^{-1}\)</span> by sparse local transformation matrices <span class="math inline">\(M_{in}\)</span>, <span class="math inline">\(M_{out}\)</span>, and <span class="math inline">\(W_{in}\)</span>.</p></li>
+</ul>
+</section>
+<section id="integration-with-mlai-trend-models-hybrid-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="integration-with-mlai-trend-models-hybrid-estimation">Integration with ML/AI trend models (hybrid estimation)</h3>
+<p>Refactoring geostatistics around this framework fits naturally with modern Machine Learning residual pipelines (e.g., Random Forest Kriging, Neural Spatial Process Models):</p>
+<p><span class="math display">\[\hat{Z}(x_0)= \underbrace{f_{ML}(x_0)}_{Global\ Trend\ (AI/ML)} + \underbrace{w_{USE}^T(Z−f_{ML}(X))}_{Spatially\ Adapted\ Residual}\]</span></p>
+<ul>
+<li><p>ML Model (<span class="math inline">\(f_{ML}\)</span>) captures high-dimensional, non-linear global trends across complex feature spaces (e.g., elevation, remote sensing data, meteorological covariates).</p></li>
+<li><p>USE Framework (<span class="math inline">\(w_{USE}\)</span>) models the spatial autocorrelation of the residuals (<span class="math inline">\(e=Z−f_{ML}\)</span>).</p></li>
+<li><p>Synergy with Modifiers: If ML uncertainty varies across regions, the local variance matrix <span class="math inline">\(R\)</span> dynamically absorbs model variance sinks, down-weighting residuals in regions where the ML model is uncertain.</p></li>
+</ul>
+</section>
+<section id="simplification-of-complex-geostatistical-formulations" class="level3">
+<h3 class="anchored" data-anchor-id="simplification-of-complex-geostatistical-formulations">Simplification of complex geostatistical formulations</h3>
+<p>Many traditionally complex, standalone Kriging variants can now be refactored as lightweight config profiles over the same unified solver core:</p>
+<ul>
+<li><p>Universal / Trend Kriging: Replaced by assigning polynomial drift or ML trend outputs directly to the additive offsets (<span class="math inline">\(U_0\)</span>,<span class="math inline">\(U_1\)</span>).</p></li>
+<li><p>Heteroscedastic / Variable-Nugget Kriging: Replaced by passing point-specific error variances into the diagonal of <span class="math inline">\(S\)</span>.</p></li>
+<li><p>Indicator and Fuzzy Kriging: Replaced by setting continuous membership function profiles in <span class="math inline">\(W\)</span>.</p></li>
+<li><p>Moving Window Kriging: Replaced by applying a continuous spatial decay matrix <span class="math inline">\(W\)</span> instead of truncating data matrices and re-inverting <span class="math inline">\((LKR+S)\)</span> at every step.</p></li>
+</ul>
+<p>This framework transforms what would usually be separate, complex Go packages into a single core engine with pluggable modifier interfaces.</p>
+</section>
+<section id="computational-mechanics-and-structural-insights" class="level3">
+<h3 class="anchored" data-anchor-id="computational-mechanics-and-structural-insights">Computational mechanics and structural insights</h3>
+<ul>
+<li><p>Computational complexity difference: Matrix addition scales at <span class="math inline">\(O(N^2)\)</span> linear memory access overhead, whereas standard matrix multiplication scales at <span class="math inline">\(O(N*3)\)</span> (or <span class="math inline">\(O(N^{2.81}\)</span>) via Strassen’s algorithm). For an <span class="math inline">\(N×N\)</span> matrix, addition is roughly 100× to 1000× faster depending on CPU cache alignment and vectorisation.</p></li>
+<li><p>Preserving convexity (<span class="math inline">\(\sum{w_i}=1\)</span>): Multiplicative scaling allows row-stochastic or scalar normalization factors to naturally preserve or proportionally re-scale the sum of weights. Additive modifiers (<span class="math inline">\(U_0\)</span>,<span class="math inline">\(U_1\)</span>) shift values uniformly. To maintain <span class="math inline">\(\sum{w_i}=1\)</span> under additive terms, any added offset vector <span class="math inline">\(U_{1,i}\)</span> must satisfy <span class="math inline">\(\sum{U_{1,i}}=0\)</span> (a zero-sum mean-neutral perturbation).</p></li>
+<li><p>Inversion-free modifiers: Keeping all dynamic modifier matrices outside the inversion operator—or restricting modifications inside the inverse to additive noise matrices—avoids re-evaluating <span class="math inline">\(O(N^3)\)</span> inversions and prevents ill-conditioned matrix instabilities during runtime evaluations.</p></li>
 </ul>
 </section>
 <section id="software-architecture" class="level3">
@@ -718,11 +667,7 @@ Table&nbsp;1: Modifier matrix breakdown and typographical mapping
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    ApplyR<span class="op">(</span>K CovarianceMatrix<span class="op">)</span> CovarianceMatrix <span class="co">// Variance/Nugget injection</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    ApplyD<span class="op">(</span>kKInv Vector<span class="op">)</span> Vector     <span class="co">// Spatial bias or drift offset</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The design keeps the memory footprint low and execution speeds high:</p>
-<ul>
-<li><p>The Core (<span class="math inline">\(kK^{-1}\)</span>): Heavy linear algebra (matrix inversion, continuous variogram evaluation) happens once during initialization.</p></li>
-<li><p>The Middleware (<span class="math inline">\(M\)</span>, <span class="math inline">\(V\)</span>, <span class="math inline">\(R\)</span>, <span class="math inline">\(D\)</span>): Light, matrix-vector or diagonal tensor operations executed dynamically per target point.</p></li>
-</ul>
+<p>The design keeps the memory footprint low and execution speeds high.</p>
 
 
 </section>

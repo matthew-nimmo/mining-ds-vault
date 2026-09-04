@@ -10,3 +10,5 @@ format:
     codefont: "Source Code Pro"
     geometry: "margin=1in"
     include-in-header: ../../header.typ
+    include-before: |
+      #show table.cell: set text(size: 9pt)
