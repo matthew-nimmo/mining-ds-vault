@@ -43,7 +43,7 @@ The vault is built on:
 ## Related Resources
 
 - Nimmo Analytics: https://nimmoanalytics.au
-- Mining DS Blog: https://nimmoanalytics.au/blog
+- Mining DS Blog: https://nimmoanalytics.au/posts/
 
 **The identity page for the mining-ds Hub**
 ➡️ Visit https://matthew-nimmo.github.io/mining-ds/
