@@ -1,46 +1,36 @@
-# Mining‑ds‑vault — Work in Progress
+# Mining DS Vault
 
-This repository is part of the **mining‑ds‑vault**, a growing collection of reproducible analyses, workflows, experiments, and explanatory examples.
+The Mining DS Vault is the source repository for the Mining DS knowledge ecosystem.
 
-It is being developed **in public** as the broader system evolves.
+This repository contains the source documents, frameworks, methodologies, and reference material used to publish content across the Mining DS platform.
 
-## Status
+## Documentation & Knowledge Hub
 
-This entry is a **work in progress**.
-Content will expand after each LinkedIn post in the series.
+Published content is available through the Nimmo Analytics website:
 
-## Purpose
+➡️ https://nimmoanalytics.au/blog
 
-The goal of the vault is to provide:
-- clear, reproducible examples
-- narrative workflows
-- literate programming outputs (R + Quarto)
-- practical demonstrations of methods used in mining and related domains
+## What is Mining DS?
 
-## Notes
+Mining DS is a mining data science and analytics knowledge platform focused on:
 
-The _extension directory contains shared Quarto/Typst extensions, fonts, and assets required to render all vault documents. It is part of the canonical rendering environment and must be included in all source distributions. Document rendering is done from the root directory of the repository.
+- Geology
+- Geometallurgy
+- Resource Modelling
+- Mine Planning
+- Mineral Processing
+- Mining Analytics
+- Data Engineering
+- Data Science for Mining
 
-## Coming Next
+## Repository Purpose
 
-Planned additions for this entry include:
-- expanded narrative explanation
-- reproducible code blocks
-- supporting datasets or references
-- workflow diagrams or step‑by‑step reasoning
-- links to related vault entries
+This repository functions as the content source for published material and is primarily intended for:
 
-## Planned Vault Entries
-
-This list will grow as the vault evolves.
-
-- [x] Bayesian Network analysis (Titanic dataset)
-- [x] Scoring Functions (Twin Drill hole assessment)
-- [ ] Excel → Optuna experiment and journey
-- [ ] CLOPE clustering (R)
-- [ ] Predictive geometallurgy playbook (multi‑part)
-- [ ] Workflows (markdown descriptions + tool suggestions)
-- [ ] How‑tos that output slide decks (R + Quarto)
+- Content development
+- Knowledge management
+- Version control
+- Publishing workflows
 
 ## Philosophy
 
@@ -50,4 +40,14 @@ The vault is built on:
 - openness
 - sharing practical knowledge with the industry
 
-New entries are announced on LinkedIn as they are released.
+## Related Resources
+
+- Nimmo Analytics: https://nimmoanalytics.au
+- Mining DS Blog: https://nimmoanalytics.au/blog
+
+**The identity page for the mining-ds Hub**
+➡️ Visit https://matthew-nimmo.github.io/mining-ds/
+
+**Looking for the identity pages**
+➡️ Visit https://matthew-nimmo.github.io/mining-ds-vault/
+➡️ Visit https://matthew-nimmo.github.io/mining-ds-toolkit/
